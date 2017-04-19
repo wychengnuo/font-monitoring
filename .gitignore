@@ -1,0 +1,15 @@
+
+dist/
+tmp/
+.tmp/
+/dev
+
+*.log
+
+.idea
+.vscode/
+/server/outRouter.js.conf
+/server/outRouter.js
+npm-debug.log
+node_modules/
+static/
