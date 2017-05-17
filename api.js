@@ -5,7 +5,7 @@ const crypt = require('./ctypto/ctypto').crypt;
 
 module.exports = function (router, koaBody) {
     var errToken;
-    router.post('/index', koaBody, function* () {
+    router.post('/index', koaBody, function () {
         var ctx = this;
 
         var m = JSON.stringify(ctx.request.body);
@@ -30,13 +30,16 @@ module.exports = function (router, koaBody) {
         }
     });
 
-    router.get('/getError', function* (next) {
+    router.get('/getError', function* () {
 
         var ctx = this;
 
-        var data = yield redis.smembers('mset').then(function (value) {
-            return value;
-        });
+        var data = yield redis.smembers('mset');
+
+        // var data = async () => {
+        //     await redis.smembers('mset');
+        // }
+
 
         if (data && data.length > 0) {
 

@@ -27,33 +27,11 @@ var ind = {
 
                     for (var i = 0; i < date.length; i++) {
 
-                        td = '', td1 = '', tr = '', tr2 = '', tr3 = '';
+                        td = '', td1 = '', tr = '';
 
                         var a = JSON.parse(date[i]);
 
                         var localData = a.localData;
-
-                        debugger
-
-                        for (var e in localData) {
-
-                            var c = JSON.parse(localData[e]);
-
-                            td3 = '', td2 = '';
-
-                            for (var d in c) {
-                                td2 += '<th>' + d + '</th>';
-                                td3 += '<td>' + c[d] + '</td>';
-                            }
-
-                            if(!tr2)
-                                tr2 += '<thead><tr>' + td2 + '</tr></thead>';
-                            
-                            tr3 += '<tr>' + td3 + '</tr>';
-
-                        }
-
-                        delete a.localData;
 
                         for (var b in a) {
 
@@ -61,6 +39,23 @@ var ind = {
                             td1 += '<td>' + a[b] + '</td>';
 
                         }
+
+                        for (var e in localData) {
+                            td2, td3 = '';
+
+                            var c = JSON.parse(localData[e]);
+
+                            for (var d in c) {
+                                td2 += '<th>' + d + '</th>';
+                                td3 += '<td>' + c[d] + '</td>';
+                            }
+                            
+                            if (!tr2) 
+                                tr2 += '<thead><tr>' + td2 + '</tr></thead>';
+                            tr3 += '<tr>' + td3 + '</tr>';
+                        }
+
+                        delete a.localData;
 
                         tr += '<thead><tr>' + td + '</tr></thead>';
                         tr1 += '<tr>' + td1 + '</tr>';
@@ -70,31 +65,25 @@ var ind = {
                     table = '<table class="table table-bordered table-hover">' + tr + tr1 + '</table>';
                     table1 = '<table class="table table-bordered table-hover">' + tr2 + tr3 + '</table>';
 
-                    $("#ss").html(table);
-                    $("#date").html(table1);
+                    $('#ss').html(table);
+                    $('#date').html(table1);
                 } else {
 
-                    $("#ss,#date").html('暂无数据').css('text-align','center');
+                    $('#ss,#date').html('暂无数据').css('text-align','center');
 
                 }
-
             },
             error: function (date) { 
-                 $("#ss,#date").html('暂无数据').css('text-align','center');
+                $('#ss,#date').html('暂无数据').css('text-align','center');
             }
         });
     }
-
-
 };
 
 
 $(function () {
-    // setInterval(function () {
-    //     ind.getDate();
-    // }, 2000);
 
-    $("#check").on('click', function () {
+    $('#check').on('click', function () {
         ind.getDate();
     });
     
