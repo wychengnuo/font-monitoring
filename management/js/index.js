@@ -57,6 +57,7 @@ var ind = {
             async: false,
             success: function (data) {
                 if (data.success) {
+                    
                     tr = '', tr1 = '', td = '', td1 = '';
                     var date = data.data;
                     for (var i = 0; i < date.length; i++) {
