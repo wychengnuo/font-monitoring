@@ -6,9 +6,10 @@ const fs = require('fs');
 
 const cors = require('koa-cors');
 
-const koaBody = require('koa-body')();
+const koaBody = require('koa-body');
 
 app.use(cors());
+app.use(koaBody({ multipart: true }));
 
 /**
  *  redis 监控启动
@@ -17,7 +18,7 @@ app.use(cors());
 var redis = require('./server/redis');
 
 redis.on('error', function (err) {
-    console.log("\n哈喽：\n亲爱的小伙。\n麻烦开下天眼（- 0 -）确认redis有没有在运动！！！\n");
+    console.log("\n哈喽：\n亲爱的小伙。\n请启动redis！！！\n");
     redis.disconnect();
     throw err;
 });
@@ -41,7 +42,7 @@ const router = require('koa-router')();
 
 if (fs.existsSync(addepath)) {
 
-    require(addepath)(router, koaBody);
+    require(addepath)(router);
 }
 
 app
@@ -52,9 +53,20 @@ app.on('error', function (err, ctx) {
     console.log(err);
 });
 
-var server = app.listen(3000, function () {
-    var host = server.address().address;
-    var port = server.address().port;
+const server = app.listen(3000, function () {
+    const host = server.address().address;
+    const port = server.address().port;
 
     console.log('http://%s:%s', host, port, ',启动成功');
 });
+
+
+var io = require('socket.io').listen(server);
+
+io.sockets.on('connection',function(socket){
+    console.log('User connected');
+    socket.on('disconnect',function(){
+        console.log('User disconnected');
+    });
+});
+

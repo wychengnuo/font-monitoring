@@ -5,7 +5,8 @@
     <title>测试错误回收</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="error.js"></script>
+    <script src='./management/js/socket.js' ></script>
+    <!--<script src="error.js"></script>-->
     <!--<script src="index.js">
     </script>-->
 </head>
@@ -19,12 +20,12 @@
         </DIV>
 
         <script type="text/javascript">
-            var _maq = _maq || [];
+            window._maq = window._maq || [];
             _maq.push(['_setAccount', 'lalalalal']);
 
             (function() {
                 var ma = document.createElement('script'); ma.type = 'text/javascript'; ma.async = true;
-                ma.src = ('https:' == document.location.protocol ? 'https://localhost:3000' : 'file:///Users/zhangsam/Desktop/it_err') + '/index.min.js';
+                ma.src = ('https:' == document.location.protocol ? 'https://localhost:3000' : 'file:///Users/zhangsam/it_err') + '/index.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ma, s);
             })();
         </script>

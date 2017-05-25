@@ -18,19 +18,19 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrl': 'http://10.129.221.62:3000/index',
+        'httpUrlBasic': 'http://10.129.216.38:3000/basic',
+        'httpUrl': 'http://10.129.216.38:3000/setError',
         'source': 'h5'
     };
 
-    var _maq = _maq || [];
+    var _maq = window._maq || [];
 
     /**
      *  @param 判断解析_maq 配置
      */
-
+     
     if (_maq) {
         for (var i in _maq) {
-            debugger
             switch (_maq[i][0]) {
             case '_setAccount':
                 packJSON.account = _maq[i][1];
@@ -261,14 +261,13 @@
     /**
      * @param 数据交互，前端发送的
      */
-
-    ls.set('localOne', 'true');
-
-    if (ls.get('localOne') == 'true') {
+     
+    if (!ls.get('localOne')) {
 
         var localData = localStorage;
 
         var dataBody = {
+            'account': packJSON.account,
             'jfVersion': packJSON.jfVersion,
             'openTime': packJSON.openTime,
             'source': packJSON.source,
@@ -276,7 +275,6 @@
             'appName': packJSON.appName,
             'platform': packJSON.platform,
             'appVersion': packJSON.appVersion,
-            'localData': localData,
             'domain': packJSON.domain,
             'localUrl': packJSON.localUrl,
             'title': packJSON.title,
@@ -284,15 +282,23 @@
             'lang': packJSON.lang,
             'sh': packJSON.sh,
             'sw': packJSON.sw,
-            'cd': packJSON.cd,
-            'account': packJSON.account
+            'cd': packJSON.cd
         };
         dataBody = JSON.stringify(dataBody);
-        Ajax.post(packJSON.httpUrl, dataBody, function (data) {
-
+        var dataErrorBody = JSON.stringify(localData);
+        Ajax.post(packJSON.httpUrlBasic, dataBody, function (data) {
             var date = JSON.parse(data);
 
-            if (date && date.success) {
+            if (date.success) {
+                ls.clear();
+                ls.set('localOne', 'false');
+            }
+
+        });
+        Ajax.post(packJSON.httpUrl, dataErrorBody, function (data) {
+            var date = JSON.parse(data);
+
+            if (date.success) {
                 ls.clear();
                 ls.set('localOne', 'false');
             }

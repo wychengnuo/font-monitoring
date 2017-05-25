@@ -24,7 +24,8 @@
     "koa-compose": "^3.2.1",
     "koa-cors": "^0.0.16",
     "koa-router": "^5.4.0",
-    "memory-cache": "^0.1.6"
+    "memory-cache": "^0.1.6",
+    "socket.io": "^2.0.1"
   },
   "devDependencies": {
     "babel": "^6.5.2",
