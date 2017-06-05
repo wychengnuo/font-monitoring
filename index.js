@@ -18,8 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': 'http://10.129.216.38:3000/basic',
-        'httpUrl': 'http://10.129.216.38:3000/setError',
+        'httpUrlBasic': 'http://10.129.221.174:3000/basic',
+        'httpUrl': 'http://10.129.221.174:3000/setError',
         'source': 'h5'
     };
 
@@ -83,7 +83,7 @@
             //在iPhone/iPad上有时设置setItem()时会出现诡异的QUOTA_EXCEEDED_ERR错误
             //这时一般在setItem之前，先removeItem()就ok了
             if (this.get(key) !== null) {
-                this.remove(key);
+                this.remove(key, false);
             }
             localStorage.setItem(key, value);
         },
@@ -92,8 +92,9 @@
             var v = localStorage.getItem(key);
             return v === undefined ? null : v;
         },
-        remove: function (key) {
-            localStorage.removeItem(key);
+        remove: function (key, bool) {
+            if (!bool)
+                localStorage.removeItem(key);
         },
         clear: function () {
             localStorage.clear();
@@ -178,11 +179,12 @@
                 eObj: o.eObj ? o.eObj.stack : ''
             };
             var d = JSON.stringify(data);
+            var t = 'err_' + (new Date() - 0);
 
             /**
              * 这里有个问题，已经存在的、相同的问题也统计了（）
              */
-            ls.set('err_' + (new Date() - 0), d);
+            ls.set(t, d);
         }
     }
 
@@ -259,12 +261,29 @@
     };
 
     /**
+     * @param 处理上传数据
+     */
+
+    function screening(obj) { 
+        var o = {};
+        if (obj === 'undefied' && typeof obj !== 'object') {
+            return;
+        }
+        for (var i in obj) {
+            o[i] = obj[i];
+        }
+        return o;
+    }
+
+    /**
      * @param 数据交互，前端发送的
      */
      
     if (!ls.get('localOne')) {
 
-        var localData = localStorage;
+        debugger
+
+        var localData = screening(localStorage);
 
         var dataBody = {
             'account': packJSON.account,

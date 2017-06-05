@@ -6,6 +6,7 @@ const redis = require('./server/redis');
 module.exports = function (router) {
     // var errToken;
     router.post('/basic', function* () {
+        
         var ctx = this;
         
         var m = JSON.stringify(ctx.request.body);
@@ -42,7 +43,7 @@ module.exports = function (router) {
     router.post('/setError', function* () {
         
         var ctx = this;
-        debugger
+        
         var m = JSON.stringify(ctx.request.body);
   
         redis.sadd('msets', m);
@@ -59,7 +60,6 @@ module.exports = function (router) {
         var ctx = this;
 
         var data = yield redis.smembers('msets');
-
 
         if (data && data.length > 0) {
 

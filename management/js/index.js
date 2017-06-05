@@ -10,7 +10,7 @@ var ind = {
 
     getDate: function () {
 
-        var table, td, td1,tr, tr1;
+        var table, td, td1,tr, tr1, f;
 
         $.ajax({
             type: 'get',
@@ -57,14 +57,14 @@ var ind = {
             async: false,
             success: function (data) {
                 if (data.success) {
-                    
                     tr = '', tr1 = '', td = '', td1 = '';
                     var date = data.data;
                     for (var i = 0; i < date.length; i++) {
                         var d = JSON.parse(date[i]);
                         for (var a in d) {
                             f = JSON.parse(d[a]);
-                            if (a.indexOf('err') != -1) {
+                            td = '', td1 = '';
+                            if (a.charAt(1) === 'r') {
                                 for (var e in f) {
                                     td += '<th>' + e + '</th>';
                                     td1 += '<td>' + f[e] + '</td>';
