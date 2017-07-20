@@ -18,8 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': 'http://10.129.221.174:3000/basic',
-        'httpUrl': 'http://10.129.221.174:3000/setError',
+        'httpUrlBasic': '/api/setBasic',
+        'httpUrl': '/api/setHtmlError',
         'source': 'h5'
     };
 
@@ -105,34 +105,25 @@
      * @param error 分类
      */
 
-    var errType = {
-        'SyntaxError': '语法错误',
-        'ReferenceError': '引用错误',
-        'RangeError': '范围错误',
-        'TypeError': '类型错误',
-        'URLError': 'URL错误',
-        'EvalError': 'eval错误'
-    };
-
     function errTy(sMsg) {
         var et;
         if (sMsg.indexOf('SyntaxError') > 0) {
-            et = errType['SyntaxError'] + 'SyntaxError';
+            et = 'SyntaxError';
         }
         if (sMsg.indexOf('ReferenceError') > 0) {
-            et = errType['ReferenceError'] + ',' + 'ReferenceError';
+            et = 'ReferenceError';
         }
         if (sMsg.indexOf('RangeError') > 0) {
-            et = errType['RangeError'] + ',' + 'RangeError';
+            et = 'RangeError';
         }
         if (sMsg.indexOf('TypeError') > 0) {
-            et = errType['TypeError'] + ',' + 'TypeError';
+            et = 'TypeError';
         }
         if (sMsg.indexOf('URLError') > 0) {
-            et = errType['URLError'] + ',' + 'URLError';
+            et = 'URLError';
         }
         if (sMsg.indexOf('EvalError') > 0) {
-            et = errType['EvalError'] + ',' + 'EvalError';
+            et = 'EvalError';
         }
         return et;
     }
@@ -220,7 +211,6 @@
             // 如果支持navigator.connection
         } else if (con) {
             var network = con.type;
-            alert();
             if (network != 'wifi' && network != '2' && network != 'unknown') { // unknown是为了兼容Chrome Canary
                 wifi = false;
             }
@@ -264,13 +254,17 @@
      * @param 处理上传数据
      */
 
-    function screening(obj) { 
-        var o = {};
+    function screening(obj) {
+        
+        var o;
         if (obj === 'undefied' && typeof obj !== 'object') {
             return;
         }
         for (var i in obj) {
-            o[i] = obj[i];
+            if (i.charAt(1) === 'r') {
+                o = {};
+                o[i] = obj[i];
+            }
         }
         return o;
     }
@@ -279,50 +273,37 @@
      * @param 数据交互，前端发送的
      */
      
-    if (!ls.get('localOne')) {
-
-        debugger
-
-        var localData = screening(localStorage);
-
-        var dataBody = {
-            'account': packJSON.account,
-            'jfVersion': packJSON.jfVersion,
-            'openTime': packJSON.openTime,
-            'source': packJSON.source,
-            'userAgent': packJSON.userAgent,
-            'appName': packJSON.appName,
-            'platform': packJSON.platform,
-            'appVersion': packJSON.appVersion,
-            'domain': packJSON.domain,
-            'localUrl': packJSON.localUrl,
-            'title': packJSON.title,
-            'referrer': packJSON.referrer,
-            'lang': packJSON.lang,
-            'sh': packJSON.sh,
-            'sw': packJSON.sw,
-            'cd': packJSON.cd
-        };
-        dataBody = JSON.stringify(dataBody);
-        var dataErrorBody = JSON.stringify(localData);
-        Ajax.post(packJSON.httpUrlBasic, dataBody, function (data) {
-            var date = JSON.parse(data);
-
-            if (date.success) {
-                ls.clear();
-                ls.set('localOne', 'false');
-            }
-
-        });
+    var localData = screening(localStorage);
+    
+    var dataBody = {
+        'account': packJSON.account,
+        'jfVersion': packJSON.jfVersion,
+        'openTime': packJSON.openTime,
+        'source': packJSON.source,
+        'userAgent': packJSON.userAgent,
+        'appName': packJSON.appName,
+        'platform': packJSON.platform,
+        'appVersion': packJSON.appVersion,
+        'domain': packJSON.domain,
+        'localUrl': packJSON.localUrl,
+        'title': packJSON.title,
+        'referrer': packJSON.referrer,
+        'lang': packJSON.lang,
+        'sh': packJSON.sh,
+        'sw': packJSON.sw,
+        'cd': packJSON.cd
+    };
+    dataBody = JSON.stringify(dataBody);
+    var dataErrorBody = JSON.stringify(localData);
+    Ajax.post(packJSON.httpUrlBasic, dataBody);
+    if (typeof dataErrorBody !== 'undefined') {
         Ajax.post(packJSON.httpUrl, dataErrorBody, function (data) {
             var date = JSON.parse(data);
-
             if (date.success) {
                 ls.clear();
-                ls.set('localOne', 'false');
             }
-
-        });
+        });   
     }
+
 
 })();
