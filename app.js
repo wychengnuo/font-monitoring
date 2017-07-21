@@ -78,7 +78,7 @@ app.on('error', function (err) {
     console.log(err);
 });
 
-const server = app.listen(3001, function () {
+const server = app.listen(3002, function () {
     const host = server.address().address;
     const port = server.address().port;
 

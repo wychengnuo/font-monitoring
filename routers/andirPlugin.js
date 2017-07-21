@@ -81,7 +81,7 @@ const objDate = async (data) => {
         o.isEnabis = d.isEnabis;
         o.isDisabis = d.isDisabis;
         o.fileSize = d.fileSize ? d.fileSize : '0K';
-        o.path = d.path ? 'http://10.129.142.39:3001' + d.path.split('?')[0] + '/' + d.plugName + '?' + d.path.split('?')[1]  : '没有地址';
+        o.path = d.path ? 'http://127.0.0.1:3002' + d.path.split('?')[0] + '/' + d.plugName + '?' + d.path.split('?')[1]  : '没有地址';
         arr.push(o);
     }
     return arr;
