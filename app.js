@@ -42,37 +42,31 @@ redis.on('error', function (err) {
     throw err;
 });
 
-/**
- * 暂时没有提出来，先走这里
- */
-
-var staticServer = require('koa-static');
-
-app.use(staticServer(path.join(__dirname)));
 
 /**
  * 下载文件
  */
 
-const fs = require('fs');
-// const newpath = homeDir + ';
-
 app.use(async (ctx, next) => {
 
     try {
-        const homeDir = __dirname + '/public/upload/' + ctx.query.name;
-        const filename = path.basename(homeDir);
+        const homeDir = decodeURIComponent(ctx.path);
+        let filePath = path.join(__dirname, homeDir);
+        ctx.response.attachment(filePath);
 
-        if (ctx.path.indexOf('/public/upload') > -1) {
-            ctx.body = fs.createReadStream(homeDir);
-            ctx.set('Content-disposition', 'attachment; filename=' + filename);
-        }
-        
     } catch (error) {
-        throw err;
+        throw error;
     }
     await next();
 });
+
+/**
+ * 暂时没有提出来，先走这里
+ */
+
+const staticServer = require('koa-static');
+
+app.use(staticServer(path.join(__dirname)));
 
 app.on('error', function (err) {
     console.log(err);

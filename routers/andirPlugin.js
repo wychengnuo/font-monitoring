@@ -1,6 +1,7 @@
-
 const redis = require('./../server/redis');
-const { longTimeKeys } = require('./../config/default');
+const {
+    longTimeKeys
+} = require('./../config/default');
 
 class andirApiController {
 
@@ -19,7 +20,7 @@ class andirApiController {
         /**
          * 第二步： 对返回数据进行格式处理
          */
-        
+
         const d = await list(data);
 
         /**
@@ -50,7 +51,7 @@ class andirApiController {
     }
 }
 
-const list = async (data) => {
+const list = async(data) => {
 
     let d1 = [];
     let d2 = [];
@@ -58,18 +59,18 @@ const list = async (data) => {
     for (let i = 0; i < data.length; i++) {
         let d = await redis.lrange(data[i], 0, -1);
         if (d.length > 1) {
-            for (let a = 0; a < d.length; a++){
+            for (let a = 0; a < d.length; a++) {
                 d2.push(d[a]);
             }
         } else {
             d1 = d;
         }
-        
+
     }
     return d2.concat(d1);
 };
 
-const objDate = async (data) => {
+const objDate = async(data) => {
     let arr = [];
     let o = {};
 
@@ -81,7 +82,7 @@ const objDate = async (data) => {
         o.isEnabis = d.isEnabis;
         o.isDisabis = d.isDisabis;
         o.fileSize = d.fileSize ? d.fileSize : '0K';
-        o.path = d.path ? 'http://127.0.0.1:3002' + d.path.split('?')[0] + '/' + d.plugName + '?' + d.path.split('?')[1]  : '没有地址';
+        o.path = d.path ? 'http://127.0.0.1:3002' + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址';
         arr.push(o);
     }
     return arr;
