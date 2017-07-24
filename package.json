@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node --harmony-async-await app.js",
     "writeFile": "node ./logs/errLog.js",
-    "start": "NODE_ENV=production PORT=3000 pm2 start app.js -i 1 --name font-monitoring",
+    "start": "NODE_ENV=production PORT=3002 pm2 start app.js -i 1 --name font-monitoring",
     "restart": "pm2 reload font-monitoring",
     "stop": "pm2 stop font-monitoring",
     "delete": "pm2 delete font-monitoring"
