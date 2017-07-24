@@ -132,7 +132,7 @@ class ApiController {
         if (isOk) {
             if (ctx.request.body) {
 
-                redis.sadd(longTimeKeys.plug, m);
+                redis.hset(longTimeKeys.plug, ctx.request.body.account, m);
 
                 return ctx.body = {
                     msg: '成功',
@@ -156,7 +156,7 @@ class ApiController {
 
     static async getPlug(ctx, next) {
 
-        await getDate(ctx, next, longTimeKeys.plug);
+        await getDate(ctx, next, longTimeKeys.plug, 1);
     }
 
     // 添加项目--添加分组项目
@@ -201,8 +201,8 @@ class ApiController {
         const file = ctx.request.body.files.file;
         const reader = fs.createReadStream(file.path);
         const homeDir = path.resolve(__dirname, '..');
-        const baseUrl = homeDir + '/public/upload/' + ctx.request.body.fields.name;
-        const newpath = homeDir + '/public/upload/' + ctx.request.body.fields.name + '/' + file.name;
+        const baseUrl = homeDir + '/public/download/' + ctx.request.body.fields.name;
+        const newpath = homeDir + '/public/download/' + ctx.request.body.fields.name + '/' + file.name;
 
         /**
          * 检查插件组文件夹是否存在，不存在创建
@@ -224,7 +224,7 @@ class ApiController {
         o.time = moment().format('YYYY-MM-DD HH:mm:ss');
         o.plugName = file.name;
         o.fileSize = fileSize;
-        o.path = '/public/upload?name=' + file.name;
+        o.path = '/public/download?name=' + file.name;
 
         /**
          * 用于分页，供前端分页查看
@@ -306,7 +306,7 @@ class ApiController {
             const n = JSON.parse(data).plugName;
 
             const homeDir = path.resolve(__dirname, '..');
-            const newpath = homeDir + '/public/upload/' + ctx.request.body.name + '/' + n;
+            const newpath = homeDir + '/public/download/' + ctx.request.body.name + '/' + n;
             fs.unlink(newpath);
             redis.lrem(name + '_plug', order, data);
             ctx.body = {
@@ -327,7 +327,7 @@ class ApiController {
 
         const homeDir = path.resolve(__dirname, '..');
 
-        const newpath = homeDir + '/public/upload/' + plugName;
+        const newpath = homeDir + '/public/download/' + plugName;
 
         /**
          * 遍历删除文件

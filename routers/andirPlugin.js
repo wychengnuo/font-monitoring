@@ -34,7 +34,7 @@ class andirApiController {
                 data: {
                     list: e
                 },
-                code: '0000',
+                code: '200',
                 success: true,
                 msg: '随便'
             };
@@ -43,7 +43,7 @@ class andirApiController {
                 data: {
                     list: []
                 },
-                code: '0000',
+                code: '300',
                 success: false,
                 msg: '随便'
             };
@@ -77,11 +77,14 @@ const objDate = async(data) => {
     for (let i = 0; i < data.length; i++) {
         o = {};
         let d = JSON.parse(data[i]);
-        o.version = d.version;
+        o.version = d.plugVersion;
         o.name = d.plugName.split('.')[0];
-        o.isEnabis = d.isEnabis;
-        o.isDisabis = d.isDisabis;
+        o.isEnable = Boolean(d.isEnable);
         o.fileSize = d.fileSize ? d.fileSize : '0K';
+        o.appVer = d.version;
+        o.minPluginVer = d.appVer;
+        o.channl = d.channl;
+        o.androidVer = d.systemVer;
         o.path = d.path ? 'http://127.0.0.1:3002' + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址';
         arr.push(o);
     }
