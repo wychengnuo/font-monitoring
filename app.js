@@ -42,6 +42,17 @@ redis.on('error', function (err) {
     throw err;
 });
 
+const fs = require('fs');
+
+const baseUrl = path.join(__dirname, '/public/');
+const baseUrlList = path.join(__dirname, '/public/download');
+
+if (!fs.existsSync(baseUrl)) {
+    fs.mkdirSync(baseUrl);
+    if (!fs.existsSync(baseUrlList)) {
+        fs.mkdirSync(baseUrlList);
+    }
+}
 
 /**
  * 下载文件
