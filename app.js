@@ -71,6 +71,12 @@ app.use(async (ctx, next) => {
     await next();
 });
 
+
+const staticServer = require('koa-static');
+
+app.use(staticServer(path.join(__dirname)));
+
+
 app.on('error', function (err) {
     console.log(err);
 });
