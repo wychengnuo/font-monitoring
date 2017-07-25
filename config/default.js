@@ -2,6 +2,8 @@
 module.exports = {
 
     redis: 'redis://127.0.0.1:6379',
+
+    host: 'samzhang.com.cn',
     
     /**
      * 关于数据库值存在的时间

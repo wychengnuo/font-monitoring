@@ -1,7 +1,11 @@
 const redis = require('./../server/redis');
-const {
-    longTimeKeys
-} = require('./../config/default');
+
+const { host } = require('./../config/default');
+
+const os = require('os');
+
+const networkInterfaces = os.networkInterfaces();
+const eth0 = (networkInterfaces.eth0 || networkInterfaces.en0).filter(i=> i.family === 'IPv4');
 
 class andirApiController {
 
@@ -86,7 +90,7 @@ const objDate = async(data) => {
         o.channl = d.channl;
         o.androidVer = Number(d.systemVer);
         o.optionsRadios = d.optionsRadios;
-        o.path = d.path ? 'http://127.0.0.1:3002' + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址';
+        o.path = d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址';
         arr.push(o);
     }
     return arr;
