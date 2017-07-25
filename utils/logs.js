@@ -26,18 +26,15 @@ function loggers(ctx, start, redis, err) {
     const t = time(start);
     const status = err ? (err.status || 500) : (ctx.status || 404);
     const o = {};
-    const c = {};
-    c.originalUrl = ctx.originalUrl;
     o.method = ctx.method;
     o.originalUrl = ctx.originalUrl;
     o.status = status;
     o.t = t;
     o.time = nowTime();
-    if (ctx.originalUrl !== '/__webpack_hmr' && status !== 404 && status != '200') {
+    if (ctx.originalUrl !== '/__webpack_hmr' && status != '404' && status != '200') {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
-        let m = JSON.stringify(c);
         let n = JSON.stringify(o);
-        redis.sadd(keys.errlogs, m);
+        redis.sadd(keys.errlogs, n);
         redis.rpush(keys.pageError, n);
     }
 }
