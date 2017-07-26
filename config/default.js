@@ -84,6 +84,13 @@ module.exports = {
     user: {
         username: 'zhangsam',
         password: 'aa1111'
+    },
+
+    /**
+     * 增加注册入口
+     */
+    register: {
+        register: 'register'
     }
 };
 

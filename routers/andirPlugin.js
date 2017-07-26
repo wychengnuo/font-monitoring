@@ -86,10 +86,10 @@ const objDate = async(data) => {
         o.isEnable = Boolean(d.isEnable);
         o.fileSize = d.fileSize ? d.fileSize : '0K';
         o.appVer = Number(d.version);
-        o.minPluginVer = d.appVer;
+        o.updateType = Number(d.appVer);
         o.channl = d.channl;
         o.androidVer = Number(d.systemVer);
-        o.optionsRadios = Number(d.optionsRadios);
+        o.isAll = Number(d.optionsRadios);
         o.path = d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址';
         arr.push(o);
     }

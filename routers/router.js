@@ -43,6 +43,8 @@ const upload = multer({ storage: storage });
 
 router
     .post('/api/login', user.login)
+    .post('/api/register', user.register)
+    .get('/api/userInfo', oauth.user, user.userInfo)
     .post('/api/setBasic', oauth.user, api.setBasic)
     .get('/api/getBasic', oauth.user, api.getBasic)
     .post('/api/setHtmlError', oauth.user, api.setHtmlError)
