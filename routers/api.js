@@ -197,13 +197,35 @@ class ApiController {
         /**
          * 存储文件
          */
+        
 
         const file = ctx.request.body.files.file;
+
+        let version = ctx.request.body.fields.plugVersion;
+
+        /**
+         * 防止没有上传文件直接提交
+         */
+
+        if (!file.name) {
+
+            ctx.redirect(ctx.headers.referer);
+
+            return ctx.body = {
+                success: false,
+                msg: '请选择上传文件'
+            };
+        }
+
+        if (!version) {
+            version = new Date() - 0;
+        }
+
         const reader = fs.createReadStream(file.path);
         const homeDir = path.resolve(__dirname, '..');
         const baseUrl = homeDir + '/public/download/' + ctx.request.body.fields.name;
         let fileName = file.name.split('.');
-        fileName = fileName[0] + '_' + ctx.request.body.fields.plugVersion + '.' + fileName[1];
+        fileName = fileName[0] + '_' + version + '.' + fileName[1];
         let newpath = homeDir + '/public/download/' + ctx.request.body.fields.name + '/' + fileName;
 
         /**
