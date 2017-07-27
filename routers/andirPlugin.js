@@ -86,7 +86,7 @@ const objDate = async (ctx, data) => {
         .map(d => {
             return {
                 version: Number(d.plugVersion),
-                name: d.plugName,
+                name: d.plugName.split('_')[0],
                 isEnable: Boolean(d.isEnable),
                 fileSize: d.fileSize ? d.fileSize : '0K',
                 appVer: Number(d.version),
