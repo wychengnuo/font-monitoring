@@ -74,7 +74,7 @@ module.exports = {
      */
 
     corn: {
-        time: '1 23 15 * * *'
+        time: '1 30 10 * * *'
     },
 
     /**

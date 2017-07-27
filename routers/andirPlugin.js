@@ -31,7 +31,7 @@ class andirApiController {
          * 第三步： 对接口数据进行赋值处理
          */
 
-        const e = await objDate(d);
+        const e = await objDate(ctx, d);
 
         if (d) {
             ctx.body = {
@@ -74,26 +74,29 @@ const list = async(data) => {
     return d2.concat(d1);
 };
 
-const objDate = async(data) => {
-    let arr = [];
-    let o = {};
+const objDate = async (ctx, data) => {
+    
+    const appVer = ctx.query.version;
+    const androidVer = ctx.query.systemVer;
+    const channl = ctx.query.channl;
 
-    for (let i = 0; i < data.length; i++) {
-        o = {};
-        let d = JSON.parse(data[i]);
-        o.version = Number(d.plugVersion);
-        o.name = d.plugName.split('.')[0];
-        o.isEnable = Boolean(d.isEnable);
-        o.fileSize = d.fileSize ? d.fileSize : '0K';
-        o.appVer = Number(d.version);
-        o.updateType = Number(d.appVer);
-        o.channl = d.channl;
-        o.androidVer = Number(d.systemVer);
-        o.isAll = Number(d.optionsRadios);
-        o.path = d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址';
-        arr.push(o);
-    }
-    return arr;
+    return data
+        .map(JSON.parse)
+        .filter(e => e.optionsRadios == '1' || appVer == e.appVer || androidVer == e.systemVer || channl == e.channl)
+        .map(d => {
+            return {
+                version: Number(d.plugVersion),
+                name: d.plugName.split('.')[0],
+                isEnable: Boolean(d.isEnable),
+                fileSize: d.fileSize ? d.fileSize : '0K',
+                appVer: Number(d.version),
+                updateType: Boolean(Number(d.appVer)),
+                channl: d.channl,
+                androidVer: Number(d.systemVer),
+                isAll: Boolean(Number(d.optionsRadios)),
+                path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址'
+            };
+        });
 };
 
 module.exports = andirApiController;
