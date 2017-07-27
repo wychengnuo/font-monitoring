@@ -202,7 +202,8 @@ class ApiController {
         const reader = fs.createReadStream(file.path);
         const homeDir = path.resolve(__dirname, '..');
         const baseUrl = homeDir + '/public/download/' + ctx.request.body.fields.name;
-        const newpath = homeDir + '/public/download/' + ctx.request.body.fields.name + '/' + file.name;
+        let newpath = homeDir + '/public/download/' + ctx.request.body.fields.name + '/' + file.name;
+        let filePlugName = file.name;
 
         /**
          * 检查插件组文件夹是否存在，不存在创建
@@ -210,6 +211,22 @@ class ApiController {
 
         if (!fs.existsSync(baseUrl)) {
             fs.mkdirSync(baseUrl);
+        }
+
+        const isFsFile = isFile(newpath);
+
+        if (isFsFile) {
+
+            let fileName = file.name;
+
+            fileName = fileName.split('.');
+
+            fileName = fileName[0] + '_' + (new Date() - 0) + '.' + fileName[1]; 
+
+            filePlugName = fileName;
+            
+            newpath = homeDir + '/public/download/' + ctx.request.body.fields.name + '/' + fileName;
+
         }
 
         const stream = fs.createWriteStream(newpath);
@@ -222,9 +239,9 @@ class ApiController {
 
         let o = ctx.request.body.fields;
         o.time = moment().format('YYYY-MM-DD HH:mm:ss');
-        o.plugName = file.name;
+        o.plugName = filePlugName;
         o.fileSize = fileSize;
-        o.path = '/public/download?name=' + file.name;
+        o.path = '/public/download';
 
         /**
          * 用于分页，供前端分页查看
@@ -497,6 +514,19 @@ let deleteFolder = (newpath) => {
         });
         fs.rmdirSync(newpath);
     }
+};
+
+/**
+ * 判断文件是否存在
+ */
+
+const isFile = (path) => {
+    try {
+        fs.accessSync(path, fs.F_OK);
+    } catch (e) {
+        return false;
+    }
+    return true;
 };
 
 module.exports = ApiController;
