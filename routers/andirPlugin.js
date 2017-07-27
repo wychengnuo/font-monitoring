@@ -86,7 +86,7 @@ const objDate = async (ctx, data) => {
         .map(d => {
             return {
                 version: Number(d.plugVersion),
-                name: d.plugName.split('.')[0],
+                name: d.plugName,
                 isEnable: Boolean(d.isEnable),
                 fileSize: d.fileSize ? d.fileSize : '0K',
                 appVer: Number(d.version),
@@ -94,7 +94,7 @@ const objDate = async (ctx, data) => {
                 channl: d.channl,
                 androidVer: Number(d.systemVer),
                 isAll: Boolean(Number(d.optionsRadios)),
-                path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path.split('?')[0] + '/' + d.name + '/' + d.plugName : '没有地址'
+                path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path + '/' + d.name + '/' + d.plugName : '没有地址'
             };
         });
 };
