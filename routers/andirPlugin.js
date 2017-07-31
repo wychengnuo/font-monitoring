@@ -62,7 +62,6 @@ class andirApiController {
  */
 
 const list = async (data) => {
-    let arr = [];
     return data.reduce(async (pre, cur) => await redis.lrange(cur, 0, -1), []);
 };
 
@@ -74,12 +73,30 @@ const objDate = async (ctx, data) => {
 
     let d, d1, d2;
 
+    /**
+     * 这块非常复杂，由于redis库本身限制问题，特对数据进行遍历处理
+     * @param 对所有的数据进行json化处理
+     */
+
     let temp = data
         .map(JSON.parse);
     
+    /**
+     * 插件全部使用，数据
+     */    
+    
     let temp3 = temp.filter(e => e.optionsRadios == '1');
+
+    /**
+     * 插件条件使用，数据
+     */ 
     
     let temp2 = temp.filter(e => e.optionsRadios == '0' && (appVer == e.appVer || androidVer == e.systemVer || channl == e.channl));
+
+
+    /**
+     * 以下为分别获取最大值
+     */
 
     if (temp3.length > 0) {
         d1 = temp3.map(e => (e.plugVersion = Number(e.plugVersion), e)).reduce((pre, cur) => pre.plugVersion > cur.plugVersion ? pre : cur);
@@ -88,6 +105,10 @@ const objDate = async (ctx, data) => {
     if (temp2.length > 0) {
         d2 = temp2.map(e => (e.plugVersion = Number(e.plugVersion), e)).reduce((pre, cur) => pre.plugVersion > cur.plugVersion ? pre : cur);
     }
+
+    /**
+     * 以下为最终的最大值
+     */    
 
     d = ((d2 && d2.plugVersion) > (d1 && d1.plugVersion)) ? d2 : d1;
 
