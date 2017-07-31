@@ -63,10 +63,7 @@ class andirApiController {
 
 const list = async (data) => {
     let arr = [];
-    return data.reduce(async (pre, cur) => { 
-        arr.push(await redis.lrange(cur, -1, -1));
-        return arr;
-    }, []);
+    return data.reduce(async (pre, cur) => await redis.lrange(cur, 0, -1), []);
 };
 
 const objDate = async (ctx, data) => {
@@ -75,23 +72,41 @@ const objDate = async (ctx, data) => {
     const androidVer = ctx.query.systemVer;
     const channl = ctx.query.channl;
 
-    return data
-        .map(JSON.parse)
-        .filter(e => e.optionsRadios == '1' || appVer == e.appVer || androidVer == e.systemVer || channl == e.channl)
-        .map(d => {
-            return {
-                version: Number(d.plugVersion),
-                name: d.plugName.split('_')[0],
-                isEnable: Boolean(d.isEnable),
-                fileSize: d.fileSize ? d.fileSize : '0K',
-                appVer: Number(d.version),
-                updateType: Boolean(Number(d.appVer)),
-                channl: d.channl,
-                androidVer: Number(d.systemVer),
-                isAll: Boolean(Number(d.optionsRadios)),
-                path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path + '/' + d.name + '/' + d.plugName : '没有地址'
-            };
-        });
+    let d, d1, d2;
+
+    let temp = data
+        .map(JSON.parse);
+    
+    let temp3 = temp.filter(e => e.optionsRadios == '1');
+    
+    let temp2 = temp.filter(e => e.optionsRadios == '0' && (appVer == e.appVer || androidVer == e.systemVer || channl == e.channl));
+
+    if (temp3.length > 0) {
+        d1 = temp3.map(e => (e.plugVersion = Number(e.plugVersion), e)).reduce((pre, cur) => pre.plugVersion > cur.plugVersion ? pre : cur);
+    }
+    
+    if (temp2.length > 0) {
+        d2 = temp2.map(e => (e.plugVersion = Number(e.plugVersion), e)).reduce((pre, cur) => pre.plugVersion > cur.plugVersion ? pre : cur);
+    }
+
+    d = ((d2 && d2.plugVersion) > (d1 && d1.plugVersion)) ? d2 : d1;
+
+    if (d) {
+        return {
+            version: d.plugVersion,
+            name: d.plugName.split('_')[0],
+            isEnable: Boolean(d.isEnable),
+            fileSize: d.fileSize ? d.fileSize : '0K',
+            appVer: Number(d.version),
+            updateType: Boolean(Number(d.appVer)),
+            channl: d.channl,
+            androidVer: Number(d.systemVer),
+            isAll: Boolean(Number(d.optionsRadios)),
+            path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path + '/' + d.name + '/' + d.plugName : '没有地址'
+        };
+    } else {
+        return {};
+    }
 };
 
 module.exports = andirApiController;
