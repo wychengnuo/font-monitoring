@@ -55,23 +55,18 @@ class andirApiController {
     }
 }
 
-const list = async(data) => {
+/**
+ * 
+ * @param {*} data 数组
+ * @param 返回类别最新的值
+ */
 
-    let d1 = [];
-    let d2 = [];
-
-    for (let i = 0; i < data.length; i++) {
-        let d = await redis.lrange(data[i], 0, -1);
-        if (d.length > 1) {
-            for (let a = 0; a < d.length; a++) {
-                d2.push(d[a]);
-            }
-        } else {
-            d1 = d;
-        }
-
-    }
-    return d2.concat(d1);
+const list = async (data) => {
+    let arr = [];
+    return data.reduce(async (pre, cur) => { 
+        arr.push(await redis.lrange(cur, -1, -1));
+        return arr;
+    }, []);
 };
 
 const objDate = async (ctx, data) => {
