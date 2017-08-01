@@ -293,13 +293,11 @@ class ApiController {
 
         if (num == '1') {
 
-            d.isDisabis = 'true'; // 是否启用
-            d.isEnabis = 'false';
+            d.isEnable = 'true';
 
         } else if (num == '2') {
 
-            d.isEnabis = 'true'; // 是否停用
-            d.isDisabis = 'false';
+            d.isEnable = 'false'; // 是否停用
 
         }
 
