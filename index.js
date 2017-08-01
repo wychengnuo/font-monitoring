@@ -18,8 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': '/api/setBasic',
-        'httpUrl': '/api/setHtmlError',
+        'httpUrlBasic': 'http://10.152.16.9:3002/api/setBasic',
+        'httpUrl': 'http://10.152.16.9:3002/api/setHtmlError',
         'source': 'h5'
     };
 
