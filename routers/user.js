@@ -53,7 +53,7 @@ class ApiUser {
 
             redis.set(token + '_front_sam_zhang', user.username, 'EX', t.time);
 
-            ctx.cookies.set('token', token + '_front_sam_zhang');
+            ctx.cookies.set('token', token);
 
             return ctx.body = {
                 msg: '成功',
