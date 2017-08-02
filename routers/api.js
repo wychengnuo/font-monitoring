@@ -388,7 +388,7 @@ class ApiController {
             };
         }
 
-        const val = await redis.get(token);
+        const val = await redis.get(token + '_front_sam_zhang');
 
         if (!val) {
             ctx.body = {
