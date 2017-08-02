@@ -1,7 +1,31 @@
 
 module.exports = {
 
-    redis: 'redis://127.0.0.1:6379',
+    /**
+     * 如果不是哨兵启动的时候
+     */
+    redis: {
+        port: 6379,             // Redis port
+        host: '127.0.0.1',   // Redis host
+        family: 4,               // 4 (IPv4) or 6 (IPv6)
+        password: ''           // password 
+    },
+    
+    /**
+     * 哨兵启动
+     */
+
+    // redis: {
+    //     sentinels: [
+    //         {
+    //             port: 26379,             // Redis port
+    //             host: '',   // Redis host
+    //             family: 4               // 4 (IPv4) or 6 (IPv6)
+    //         }
+    //     ],
+    //     password: '',           // password 
+    //     name:'mymaster'
+    // },
 
     host: 'samzhang.com.cn',
     

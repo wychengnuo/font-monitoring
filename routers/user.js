@@ -30,9 +30,9 @@ class ApiUser {
 
         redis.hset(register.register, d.username, JSON.stringify(d));
 
-        redis.set(token, d.password, 'EX', t.time);
+        redis.set(token + '_front_sam_zhang', d.password, 'EX', t.time);
 
-        ctx.cookies.set('token', token);
+        ctx.cookies.set('token', token + '_front_sam_zhang');
 
         return ctx.body = {
             msg: '成功',
@@ -51,9 +51,9 @@ class ApiUser {
 
             const token = crypt.creatToken(user);
 
-            redis.set(token, user.username, 'EX', t.time);
+            redis.set(token + '_front_sam_zhang', user.username, 'EX', t.time);
 
-            ctx.cookies.set('token', token);
+            ctx.cookies.set('token', token + '_front_sam_zhang');
 
             return ctx.body = {
                 msg: '成功',
@@ -66,9 +66,9 @@ class ApiUser {
 
             const tdata = crypt.creatToken(d);
 
-            redis.set(tdata, d.username, 'EX', t.time);
+            redis.set(tdata + '_front_sam_zhang', d.username, 'EX', t.time);
 
-            ctx.cookies.set('token', tdata);
+            ctx.cookies.set('token', tdata + '_front_sam_zhang');
 
             return ctx.body = {
                 msg: '成功',
@@ -93,9 +93,9 @@ class ApiUser {
                 success: true
             };
         }
-        redis.get(token).then(function (value) {
+        redis.get(token + '_front_sam_zhang').then(function (value) {
 
-            redis.del(token);
+            redis.del(token + '_front_sam_zhang');
             redis.del(value);
 
         });
@@ -116,7 +116,7 @@ class ApiUser {
 
         if (token) {
 
-            const userinfo = await redis.get(token);
+            const userinfo = await redis.get(token + '_front_sam_zhang');
 
             /**
              * 直接写死zhangsam超级账户
