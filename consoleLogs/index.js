@@ -4,7 +4,8 @@ log4js.configure(
     {
         appenders: {
             console: {
-                type: 'console'
+                type: 'console',
+                category: 'console'
             },
             file: {
                 type: 'file',
@@ -27,8 +28,9 @@ log4js.configure(
             }
         },
         categories: {
-            default: { appenders: ['file', 'dateFile', 'out'], level: 'DEBUG' }
-        }
+            default: { appenders: ['file', 'dateFile', 'out'], level: 'ALL' }
+        },
+        replaceConsole: true
     }
 );
 

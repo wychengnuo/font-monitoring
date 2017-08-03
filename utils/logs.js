@@ -31,7 +31,7 @@ function loggers(ctx, start, redis, err) {
     o.status = status;
     o.t = t;
     o.time = nowTime();
-    if (ctx.originalUrl !== '/__webpack_hmr' && status != '404' && status != '200') {
+    if (ctx.originalUrl !== '/__webpack_hmr' && status != '400' && status != '404' && status != '200') {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
         let n = JSON.stringify(o);
         redis.sadd(keys.errlogs, n);

@@ -76,6 +76,10 @@ const staticServer = require('koa-static');
 
 app.use(staticServer(path.join(__dirname)));
 
+const { log4js, expressLogger } = require('./consoleLogs/index');
+
+app.use(log4js.connectLogger(expressLogger, { level: log4js.levels.INFO }));
+
 
 app.on('error', function (err) {
     console.log(err);
