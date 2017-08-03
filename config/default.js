@@ -4,30 +4,31 @@ module.exports = {
     /**
      * 如果不是哨兵启动的时候
      */
-    redis: {
-        port: 6379,             // Redis port
-        host: '127.0.0.1',   // Redis host
-        family: 4,               // 4 (IPv4) or 6 (IPv6)
-        password: ''           // password 
-    },
+    // redis: {
+    //     port: 6379,             // Redis port
+    //     host: '127.0.0.1',   // Redis host
+    //     family: 4,               // 4 (IPv4) or 6 (IPv6)
+    //     password: ''           // password 
+    // },
     
     /**
      * 哨兵启动
      */
 
-    // redis: {
-    //     sentinels: [
-    //         {
-    //             port: 26379,             // Redis port
-    //             host: '',   // Redis host
-    //             family: 4               // 4 (IPv4) or 6 (IPv6)
-    //         }
-    //     ],
-    //     password: '',           // password 
-    //     name:'mymaster'
-    // },
+    redis: {
+        sentinels: [
+            {
+                port: 26379,             // Redis port
+                host: '10.143.108.96',   // Redis host
+                family: 4               // 4 (IPv4) or 6 (IPv6)
+            }
+        ],
+        password: 't1',           // password
+        name:'mymaster'
+    },
 
-    host: 'samzhang.com.cn',
+
+    // host: 'samzhang.com.cn',
     
     /**
      * 关于数据库值存在的时间
@@ -47,25 +48,25 @@ module.exports = {
          * mset: 用户基本版本信息
          */
 
-        mset: 'mset',
+        mset: 'front_sam_zhang_mset',
 
         /**
          * msets: 前端页面报错信息
          */
 
-        msets: 'msets',
+        msets: 'front_sam_zhang_msets',
 
         /**
          * errlogs: 接口报错信息
          */
 
-        errlogs: 'errlogs',
+        errlogs: 'front_sam_zhang_errlogs',
 
         /**
          * errlogs: 接口分页处理
          */
 
-        pageError: 'pageError'
+        pageError: 'front_sam_zhang_pageError'
     },
 
     /**
@@ -77,12 +78,12 @@ module.exports = {
          * 项目存储字段
          */
 
-        plug: 'plug',
+        plug: 'front_sam_zhang_plug',
 
         /**
          * 项目-详情-插件存储字段
          */
-        plugList: 'plugList'
+        plugList: 'front_sam_zhang_plugList'
     },
 
     /**
@@ -114,7 +115,7 @@ module.exports = {
      * 增加注册入口
      */
     register: {
-        register: 'register'
+        register: 'front_sam_zhang_register'
     }
 };
 
