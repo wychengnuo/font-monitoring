@@ -126,7 +126,7 @@ class ApiController {
     static async setPlug(ctx, next) {
 
         const m = JSON.stringify(ctx.request.body);
-        const data = await redis.smembers(longTimeKeys.plug);
+        const data = await redis.hvals(longTimeKeys.plug);
         const isOk = isSet(data, ctx);
 
         if (isOk) {
