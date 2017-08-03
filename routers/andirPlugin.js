@@ -87,10 +87,10 @@ const list = async (data) => {
 
 };
 
-const objDate = async (ctx, data) => {
+const objDate = async (ctx, data, next) => {
     
     const appVer = ctx.query.version;
-    const androidVer = ctx.query.systemVer;
+    // const androidVer = ctx.query.systemVer;
     const channl = ctx.query.channl;
 
     let d, d1, d2, arr = [];
@@ -104,7 +104,7 @@ const objDate = async (ctx, data) => {
 
     for (var i = 0; i < data.length; i++) {
 
-        temp = '';
+        temp = '', d1 = '', d2 = '';
 
         if (typeof data[i] == 'string') {
 
@@ -132,9 +132,13 @@ const objDate = async (ctx, data) => {
 
         /**
          * 插件条件使用，数据
+         *  || androidVer == e.systemVer
+         *
+         *  @param e.e.version 对应 ctx.query.version
+         *  @param e.channl 对应 ctx.query.channl
          */
         
-        let temp2 = temp.filter(e => e.optionsRadios == '0' && (appVer == e.appVer || androidVer == e.systemVer || channl == e.channl));
+        let temp2 = temp.filter(e => e.optionsRadios == '0' && (appVer == e.version && channl == e.channl));
 
         /**
          * 以下为分别获取最大值
@@ -154,15 +158,20 @@ const objDate = async (ctx, data) => {
 
         d = ((d2 && d2.plugVersion) > (d1 && d1.plugVersion)) ? d2 : d1;
 
-        if (d && typeof data[i] == 'string') {
+        try {
+            if (d.plugVersion) {
 
-            /**
-             * 数组里面是单数组的时候
-             */
+                /**
+                 * 数组里面是单数组的时候
+                 */
 
-            arr = [];
+                arr.push(d);
+            }
+            
+        } catch (error) {
+            throw error;
         }
-        arr.push(d);
+
     }
 
     return arr.map(d => {

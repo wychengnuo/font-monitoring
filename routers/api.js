@@ -126,13 +126,14 @@ class ApiController {
     static async setPlug(ctx, next) {
 
         const m = JSON.stringify(ctx.request.body);
-        const data = await redis.hvals(longTimeKeys.plug);
+        const data = await redis.hvals('front_sam_zhang_plugList');
         const isOk = isSet(data, ctx);
 
         if (isOk) {
             if (ctx.request.body) {
 
-                redis.hset(longTimeKeys.plug, ctx.request.body.account, m);
+                redis.rpush(longTimeKeys.plug, m);
+                redis.hset('front_sam_zhang_plugList', ctx.request.body.account, m);
 
                 return ctx.body = {
                     msg: '成功',
@@ -156,7 +157,7 @@ class ApiController {
 
     static async getPlug(ctx, next) {
 
-        await getDate(ctx, next, longTimeKeys.plug, 1);
+        await getDate(ctx, next, 'front_sam_zhang_plugList', 1);
     }
 
     // 添加项目--添加分组项目
