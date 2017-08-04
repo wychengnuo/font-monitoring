@@ -40,7 +40,7 @@ class andirApiController {
                 },
                 code: '200',
                 success: true,
-                msg: '随便'
+                msg: '成功'
             };
         } else {
             ctx.body = {
@@ -49,7 +49,7 @@ class andirApiController {
                 },
                 code: '300',
                 success: false,
-                msg: '随便'
+                msg: '失败'
             };
         }
     }
