@@ -16,6 +16,7 @@ class oauth {
         try {
             await next();
         } catch (error) {
+            console.log(error);
             throw error;
         }
     }

@@ -52,7 +52,10 @@ module.exports = function () {
                     vs = vs.map(v => Object.values(v).map(v => `"${v}",`).join(''));
                     
                     fs.writeFile(path.join(baseUrl + 'logs_' + moment().format('YYYY-MM-DD HH:mm:ss') + '_' + k + '.csv'), iconv.encode(headers + '\n' + vs.join('\n'), 'gbk'), 'binary', (err) => {
-                        if (err) throw err;
+                        if (err) { 
+                            console.log(err);
+                            throw err;
+                        }
                     });
                 });
             }

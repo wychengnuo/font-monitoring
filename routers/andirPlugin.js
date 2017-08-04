@@ -169,6 +169,7 @@ const objDate = async (ctx, data, next) => {
             }
             
         } catch (error) {
+            console.log(error);
             throw error;
         }
 
