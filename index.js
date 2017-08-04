@@ -18,9 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': 'http://10.152.16.9:3002/api/setBasic',
-        'httpUrl': 'http://10.152.16.9:3002/api/setHtmlError',
-        'source': 'h5'
+        'httpUrlBasic': 'http://10.143.108.100:3002/api/setBasic',
+        'httpUrl': 'http://10.143.108.100:3002/api/setHtmlError'
     };
 
     var _maq = window._maq || [];
@@ -32,8 +31,9 @@
     if (_maq) {
         for (var i in _maq) {
             switch (_maq[i][0]) {
-            case '_setAccount':
+            case '_setAccount':        
                 packJSON.account = _maq[i][1];
+                packJSON.source = _maq[i][2];      
                 break;
             default:
                 break;

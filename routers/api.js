@@ -396,9 +396,13 @@ class ApiController {
                 msg: '请登录',
                 success: false
             };
+        } else {
+            ctx.body = {
+                msg: '成功',
+                success: true
+            };
         }
-
-        await next();
+        // await next();
     }
 
 }
