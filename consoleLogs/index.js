@@ -9,7 +9,7 @@ log4js.configure(
             },
             file: {
                 type: 'file',
-                filename: './../loggers/access.log',
+                filename: './loggers/access.log',
                 maxLogSize: 10 * 1024 * 1024, // = 10Mb
                 numBackups: 3, // keep five backup files
                 compress: true, // compress the backups
@@ -19,7 +19,7 @@ log4js.configure(
             },
             dateFile: {
                 type: 'dateFile',
-                filename: './../loggers/more-access.log',
+                filename: './loggers/more-access.log',
                 pattern: 'yyyy-MM-dd-hh',
                 compress: true
             },
