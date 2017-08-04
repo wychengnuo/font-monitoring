@@ -22,7 +22,8 @@ function getInterface(redis) {
     };
 }
 
-function loggers(ctx, start, redis, err) {    
+function loggers(ctx, start, redis, err) {
+    console.log(err);
     const t = time(start);
     const status = err ? (err.status || 500) : (ctx.status || 404);
     const o = {};

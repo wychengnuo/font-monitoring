@@ -13,6 +13,7 @@ function existenceTime(redis) {
         try {
             await next();
         } catch (err) {
+            console.log(err);
             eachKeys(keys, redis, err);
             throw err;
         } 

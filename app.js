@@ -37,6 +37,7 @@ app
 redis.on('error', function (err) {
     console.log('\n哈喽：\n亲爱的小伙。\n请启动redis！！！\n');
     redis.disconnect();
+    console.log(err);
     throw err;
 });
 
@@ -64,6 +65,7 @@ app.use(async (ctx, next) => {
         ctx.response.attachment(filePath);
 
     } catch (error) {
+        console.log(error);
         throw error;
     }
     await next();
