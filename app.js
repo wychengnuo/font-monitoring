@@ -30,8 +30,6 @@ const redis = require('./server/redis');
 app
     .use(getInterface(redis))
     .use(existenceTime(redis));
-
-require('babel-register');
 /**
  *  redis 监控启动
  */
@@ -70,7 +68,6 @@ app.use(async (ctx, next) => {
     }
     await next();
 });
-
 
 const staticServer = require('koa-static');
 
