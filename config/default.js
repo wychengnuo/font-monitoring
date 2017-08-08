@@ -15,19 +15,6 @@ module.exports = {
      * 哨兵启动
      */
 
-    // redis: {
-    //     sentinels: [
-    //         {
-    //             port: 26379,             // Redis port
-    //             host: '10.143.108.96',   // Redis host
-    //             family: 4               // 4 (IPv4) or 6 (IPv6)
-    //         }
-    //     ],
-    //     password: 't1',           // password
-    //     name:'mymaster'
-    // },
-
-
     // host: 'samzhang.com.cn',
     
     /**
