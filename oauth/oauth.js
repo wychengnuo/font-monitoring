@@ -27,7 +27,7 @@ class oauth {
         const token = ctx.cookies.get('token');
 
         if (!token) {
-            return ctx.body = {
+            ctx.body = {
                 msg: '请登录',
                 success: false
             };
@@ -36,7 +36,7 @@ class oauth {
         const val = await redis.get(token + '_front_sam_zhang');
         
         if (!val) {
-            return ctx.body = {
+            ctx.body = {
                 msg: '请登录',
                 success: false
             };

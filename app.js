@@ -59,15 +59,24 @@ if (!fs.existsSync(baseUrl)) {
 
 app.use(async (ctx, next) => {
 
-    try {
-        const homeDir = decodeURIComponent(ctx.path);
-        let filePath = path.join(__dirname, homeDir);
-        ctx.response.attachment(filePath);
+    /**
+     * 兼容api不走下载
+     */
 
-    } catch (error) {
-        console.log(error);
-        throw error;
+    if (ctx.originalUrl.indexOf('api') == -1) {
+
+        try {
+            const homeDir = decodeURIComponent(ctx.path);
+            let filePath = path.join(__dirname, homeDir);
+            ctx.response.attachment(filePath);
+
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+
     }
+
     await next();
 });
 
@@ -75,14 +84,9 @@ const staticServer = require('koa-static');
 
 app.use(staticServer(path.join(__dirname)));
 
-const { log4js, expressLogger } = require('./consoleLogs/index');
+const getKoaLogger = require('koa2-loggers');
 
-app.use(log4js.connectLogger(expressLogger, { level: log4js.levels.INFO }));
-
-
-app.on('error', function (err) {
-    console.log(err);
-});
+app.use(getKoaLogger({ level: 'auto'}));
 
 const server = app.listen(3002, function () {
     const host = server.address().address;
