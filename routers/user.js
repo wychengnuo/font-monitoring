@@ -19,7 +19,7 @@ class ApiUser {
         d.time = time;
 
         if (!d) {
-            return ctx.body = {
+            ctx.body  = {
                 msg: '失败',
                 success: false,
                 data: {}
@@ -34,7 +34,7 @@ class ApiUser {
 
         ctx.cookies.set('token', token);
 
-        return ctx.body = {
+        ctx.body  = {
             msg: '成功',
             success: true
         };
@@ -55,7 +55,7 @@ class ApiUser {
 
             ctx.cookies.set('token', token);
 
-            return ctx.body = {
+            ctx.body  = {
                 msg: '成功',
                 success: true
             };
@@ -70,13 +70,13 @@ class ApiUser {
 
             ctx.cookies.set('token', tdata);
 
-            return ctx.body = {
+            ctx.body  = {
                 msg: '成功',
                 success: true
             };
 
         } else {
-            return ctx.body = {
+            ctx.body  = {
                 msg: '账号密码错误！！！',
                 success: false
             };
@@ -88,7 +88,7 @@ class ApiUser {
 
         const token = ctx.cookies.get('token');
         if (!token) {
-            return ctx.body = {
+            ctx.body  = {
                 msg: '退出成功',
                 success: true
             };
@@ -102,7 +102,7 @@ class ApiUser {
 
         ctx.cookies.set('token', '');
 
-        return ctx.body = {
+        ctx.body  = {
             msg: '退出成功',
             success: true
         };
@@ -123,7 +123,7 @@ class ApiUser {
              */
 
             if (userinfo == 'zhangsam') {
-                return ctx.body = {
+                ctx.body  = {
                     success: true,
                     msg: '成功',
                     data: {
@@ -141,19 +141,19 @@ class ApiUser {
             delete data.password;
 
             if (data) {
-                return ctx.body = {
+                ctx.body  = {
                     success: true,
                     msg: '成功',
                     data: data
                 };
             } else {
-                return ctx.body = {
+                ctx.body  = {
                     success: false,
                     msg: '失败'
                 };
             }
         } else {
-            return ctx.body = {
+            ctx.body  = {
                 success: false,
                 msg: '请登录'
             };

@@ -31,18 +31,18 @@ class ApiController {
 
                 redis.sadd(keys.mset, m);
 
-                return ctx.body = {
+                ctx.body = {
                     msg: '成功',
                     success: true
                 };
             } else {
-                return ctx.body = {
+                ctx.body = {
                     msg: '失败',
                     success: false
                 };
             }
         } else {
-            return ctx.body = {
+            ctx.body = {
                 msg: '失败',
                 success: false
             };
@@ -61,7 +61,7 @@ class ApiController {
 
         redis.sadd(keys.msets, m);
 
-        return ctx.body = {
+        ctx.body = {
             msg: '成功',
             success: true
         };
@@ -97,11 +97,12 @@ class ApiController {
             }
         }
         const data = await type(a);
-        return ctx.body = {
+        ctx.body = {
             success: true,
             data: data,
             msg: '成功'
         };
+        await next();
     }
 
     // 对接口错误信息返回进行处理
@@ -114,7 +115,7 @@ class ApiController {
             a.push(c.originalUrl);
         }
         const data = await type(a);
-        return ctx.body = {
+        ctx.body = {
             success: true,
             data: data,
             msg: '成功'
@@ -135,18 +136,18 @@ class ApiController {
                 redis.rpush(longTimeKeys.plug, m);
                 redis.hset('front_sam_zhang_plugList', ctx.request.body.account, m);
 
-                return ctx.body = {
+                ctx.body = {
                     msg: '成功',
                     success: true
                 };
             } else {
-                return ctx.body = {
+                ctx.body = {
                     msg: '失败',
                     success: false
                 };
             }
         } else {
-            return ctx.body = {
+            ctx.body = {
                 msg: '失败',
                 success: false
             };
@@ -172,12 +173,12 @@ class ApiController {
 
             redis.hset(ctx.request.body.category, ctx.request.body.plugName, m);
 
-            return ctx.body = {
+            ctx.body = {
                 msg: '成功',
                 success: true
             };
         } else {
-            return ctx.body = {
+            ctx.body = {
                 msg: '失败',
                 success: false
             };
@@ -212,7 +213,7 @@ class ApiController {
 
             ctx.redirect(ctx.headers.referer);
 
-            return ctx.body = {
+            ctx.body = {
                 success: false,
                 msg: '请选择上传文件'
             };
@@ -315,7 +316,7 @@ class ApiController {
 
             redis.lset(name + '_plug', order, JSON.stringify(d));
 
-            return ctx.body = {
+            ctx.body = {
                 success: true,
                 msg: '操作成功',
                 data: data
@@ -423,14 +424,14 @@ const getDate = async(ctx, next, str, num) => {
 
     if (data && data.length > 0) {
 
-        return ctx.body = {
+        ctx.body = {
             data: data,
             msg: '成功',
             success: true
         };
 
     } else {
-        return ctx.body = {
+        ctx.body = {
             data: null,
             msg: '失败',
             success: false
@@ -478,14 +479,14 @@ const paging = async(ctx, keys) => {
     }
 
     if (data) {
-        return ctx.body = {
+        ctx.body = {
             success: true,
             data: data,
             msg: '成功',
             pageSize: Math.ceil(dataLeng / 10)
         };
     } else {
-        return ctx.body = {
+        ctx.body = {
             success: false,
             data: {},
             msg: '失败',
