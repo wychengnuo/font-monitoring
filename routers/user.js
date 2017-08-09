@@ -45,7 +45,7 @@ class ApiUser {
 
         const d = ctx.request.body;
 
-        const isRegist = await isRegister(ctx);
+        let isRegist = await isRegister(ctx);
 
         if (d.username == user.username && d.password == user.password) {
 
@@ -62,18 +62,26 @@ class ApiUser {
 
         } else if (isRegist) {
 
-            const d = ctx.request.body;
+            isRegist = JSON.parse(isRegist);
 
-            const tdata = crypt.creatToken(d);
+            if (isRegist.username == d.username && isRegist.password == d.password) {
 
-            redis.set(tdata + '_front_sam_zhang', d.username, 'EX', t.time);
+                const tdata = crypt.creatToken(d);
 
-            ctx.cookies.set('token', tdata);
+                redis.set(tdata + '_front_sam_zhang', d.username, 'EX', t.time);
 
-            ctx.body  = {
-                msg: '成功',
-                success: true
-            };
+                ctx.cookies.set('token', tdata);
+
+                ctx.body = {
+                    msg: '成功',
+                    success: true
+                };
+            } else {
+                ctx.body  = {
+                    msg: '账号密码错误！！！',
+                    success: false
+                };
+            }    
 
         } else {
             ctx.body  = {
@@ -123,7 +131,7 @@ class ApiUser {
              */
 
             if (userinfo == 'zhangsam') {
-                ctx.body  = {
+                return ctx.body  = {
                     success: true,
                     msg: '成功',
                     data: {
@@ -171,7 +179,7 @@ const isRegister = async(ctx) => {
     const d = await redis.hget(register.register, data.username);
 
     if (d) {
-        s = true;
+        return d;
     }
 
     return s;
