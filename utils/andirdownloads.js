@@ -15,11 +15,13 @@ module.exports = async (channl, next) => {
      * 检查redis是否存在channl
      */
 
-    if (!await redis.get(longTimeKeys.plugDownloads + '_' + channl)) {
-        redis.set(longTimeKeys.plugDownloads + '_' + channl, 0);
+    if (channl) {
+        if (!await redis.get(longTimeKeys.plugDownloads + '_' + channl)) {
+            redis.set(longTimeKeys.plugDownloads + '_' + channl, 0);
+        }
+
+        redis.incr(longTimeKeys.plugDownloads + '_' + channl);
     }
-
-    redis.incr(longTimeKeys.plugDownloads + '_' + channl);
-
+    
     await next();
 };
