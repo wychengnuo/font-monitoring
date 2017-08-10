@@ -406,6 +406,30 @@ class ApiController {
         // await next();
     }
 
+
+    /**
+     * 获取下载量
+     */
+
+    static async getPlugDownloads(ctx, next) {
+        const d = await redis.keys('*front_sam_zhang_plugDownloads*');
+        
+        const data = await downloads(d);
+        
+        if (data) {
+            ctx.body = {
+                success: true,
+                data: data,
+                msg: '成功'
+            };
+        } else {
+            ctx.body = {
+                success: false,
+                data: {},
+                msg: '失败'
+            };
+        }
+    }
 }
 
 /**
@@ -496,7 +520,6 @@ const paging = async(ctx, keys) => {
 
 };
 
-
 /**
  * delete files
  */
@@ -525,6 +548,19 @@ let deleteFolder = (newpath) => {
         });
         fs.rmdirSync(newpath);
     }
+};
+
+/**
+ * 下载量处理
+ */
+
+const downloads = async (d) => {
+    let arr = {};
+    return (async () => {
+        const b = d.map(async v => arr[v] = await redis.get(v));
+        const c = await Promise.all(b);
+        return arr;
+    })();
 };
 
 module.exports = ApiController;

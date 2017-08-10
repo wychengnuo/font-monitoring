@@ -62,6 +62,7 @@ router
     .post('/api/setPlugListInfo', upload.single('file'), api.setPlugListInfo)
     .get('/api/getPlugListInfo', oauth.pass, api.getPlugListInfo)
     .post('/api/delPlug', oauth.pass, api.delPlug)
+    .get('/api/getPlugDownloads', oauth.pass, api.getPlugDownloads)
     .post('/api/isLogin', api.isLogin);
 
 
