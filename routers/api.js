@@ -59,7 +59,9 @@ class ApiController {
 
         const m = JSON.stringify(ctx.request.body);
 
-        redis.rpush(keys.msets, m);
+        redis.sadd(keys.msets, m);
+
+        redis.rpush(keys.msets+ '_list', m);
 
         ctx.body = {
             msg: '成功',
@@ -69,7 +71,7 @@ class ApiController {
 
     // 获取前端页面报错信息
     static async getHtmlError(ctx, next) {
-        await paging(ctx, keys.msets);
+        await paging(ctx, keys.msets+ '_list');
 
     }
 
