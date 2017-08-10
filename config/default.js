@@ -70,7 +70,14 @@ module.exports = {
         /**
          * 项目-详情-插件存储字段
          */
-        plugList: 'front_sam_zhang_plugList'
+
+        plugList: 'front_sam_zhang_plugList',
+
+        /**
+         * 获取下载量字段
+         */
+
+        plugDownloads: 'front_sam_zhang_plugDownloads'
     },
 
     /**
