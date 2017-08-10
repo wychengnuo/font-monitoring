@@ -68,7 +68,8 @@ app.use(async (ctx, next) => {
         try {
             const homeDir = decodeURIComponent(ctx.path);
             let filePath = path.join(__dirname, homeDir);
-            require('./utils/andirdownloads')(ctx.headers['channel_code'], next);
+            const channl = ctx.headers['channel_code'];
+            require('./utils/andirdownloads')(channl, next);
             ctx.response.attachment(filePath);
 
         } catch (error) {

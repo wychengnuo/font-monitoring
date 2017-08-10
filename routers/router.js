@@ -42,28 +42,28 @@ const upload = multer({ storage: storage });
 
 
 router
-    .post('/api/login', user.login)
-    .post('/api/register', user.register)
-    .get('/api/userInfo', oauth.user, user.userInfo)
-    .post('/api/setBasic', oauth.pass, api.setBasic)
-    .get('/api/getBasic', oauth.user, api.getBasic)
-    .post('/api/setHtmlError', oauth.pass, api.setHtmlError)
-    .get('/api/getHtmlError', oauth.user, api.getHtmlError)
-    .get('/api/getLogs', oauth.user, api.getLogs)
-    .get('/api/pageError', oauth.user, api.pageError)
-    .get('/api/typeErr', oauth.user, api.getTypeErr)
-    .get('/api/getUrlErr', oauth.user, api.getUrlErr)
-    .post('/api/layout', user.layOut)
-    .post('/api/setPlug', oauth.pass, api.setPlug)
-    .get('/api/getPlug', oauth.pass, api.getPlug)
-    .post('/api/settingPlug', oauth.pass, api.settingPlug)
-    .post('/api/setPlugList', oauth.pass, api.setPlugList)
-    .get('/api/getPlugList', oauth.pass, api.getPlugList)
-    .post('/api/setPlugListInfo', upload.single('file'), api.setPlugListInfo)
-    .get('/api/getPlugListInfo', oauth.pass, api.getPlugListInfo)
-    .post('/api/delPlug', oauth.pass, api.delPlug)
-    .get('/api/getPlugDownloads', oauth.pass, api.getPlugDownloads)
-    .post('/api/isLogin', api.isLogin);
+    .post('/plugin/api/login', user.login)
+    .post('/plugin/api/register', user.register)
+    .get('/plugin/api/userInfo', oauth.user, user.userInfo)
+    .post('/plugin/api/setBasic', oauth.pass, api.setBasic)
+    .get('/plugin/api/getBasic', oauth.user, api.getBasic)
+    .post('/plugin/api/setHtmlError', oauth.pass, api.setHtmlError)
+    .get('/plugin/api/getHtmlError', oauth.user, api.getHtmlError)
+    .get('/plugin/api/getLogs', oauth.user, api.getLogs)
+    .get('/plugin/api/pageError', oauth.user, api.pageError)
+    .get('/plugin/api/typeErr', oauth.user, api.getTypeErr)
+    .get('/plugin/api/getUrlErr', oauth.user, api.getUrlErr)
+    .post('/plugin/api/layout', user.layOut)
+    .post('/plugin/api/setPlug', oauth.pass, api.setPlug)
+    .get('/plugin/api/getPlug', oauth.pass, api.getPlug)
+    .post('/plugin/api/settingPlug', oauth.pass, api.settingPlug)
+    .post('/plugin/api/setPlugList', oauth.pass, api.setPlugList)
+    .get('/plugin/api/getPlugList', oauth.pass, api.getPlugList)
+    .post('/plugin/api/setPlugListInfo', upload.single('file'), api.setPlugListInfo)
+    .get('/plugin/api/getPlugListInfo', oauth.pass, api.getPlugListInfo)
+    .post('/plugin/api/delPlug', oauth.pass, api.delPlug)
+    .get('/plugin/api/getPlugDownloads', oauth.pass, api.getPlugDownloads)
+    .post('/plugin/api/isLogin', api.isLogin);
 
 
 /**
@@ -71,7 +71,7 @@ router
  */
 
 router
-    .get('/api/andirApi', oauth.pass, andirApi.andirAppPlugin);
+    .get('/plugin/api/andirApi', oauth.pass, andirApi.andirAppPlugin);
 
 
 

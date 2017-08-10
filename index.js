@@ -18,8 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': 'http://10.143.108.100:3002/api/setBasic',
-        'httpUrl': 'http://10.143.108.100:3002/api/setHtmlError'
+        'httpUrlBasic': 'http://10.143.108.100:3002/plugin/api/setBasic',
+        'httpUrl': 'http://10.143.108.100:3002/plugin/api/setHtmlError'
     };
 
     var _maq = window._maq || [];

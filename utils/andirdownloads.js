@@ -23,5 +23,4 @@ module.exports = async (channl, next) => {
         redis.incr(longTimeKeys.plugDownloads + '_' + channl);
     }
     
-    await next();
 };
