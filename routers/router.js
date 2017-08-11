@@ -56,6 +56,7 @@ router
     .post('/plugin/api/layout', user.layOut)
     .post('/plugin/api/setPlug', oauth.pass, api.setPlug)
     .get('/plugin/api/getPlug', oauth.pass, api.getPlug)
+    .post('/plugin/api/delAndirPlug', oauth.pass, api.deleteAndirPlug)
     .post('/plugin/api/settingPlug', oauth.pass, api.settingPlug)
     .post('/plugin/api/setPlugList', oauth.pass, api.setPlugList)
     .get('/plugin/api/getPlugList', oauth.pass, api.getPlugList)
