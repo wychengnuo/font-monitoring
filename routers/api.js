@@ -163,6 +163,33 @@ class ApiController {
         await getDate(ctx, next, 'front_sam_zhang_plugList', 1);
     }
 
+    // 删除项目
+
+    static async deleteAndirPlug(ctx, next) {
+
+        const value = ctx.request.body.account;
+
+        if (value) {
+            const num = await redis.hdel('front_sam_zhang_plugList', value);
+            if (num === 1) {
+                return ctx.body = {
+                    success: true,
+                    msg: '删除成功'
+                };
+            } else {
+                return ctx.body = {
+                    success: false,
+                    msg: '删除失败'
+                };
+            }
+        }
+        return ctx.body = {
+            success: false,
+            msg: '删除失败'
+        };
+
+    }
+
     // 添加项目--添加分组项目
 
     static async setPlugList(ctx, next) {
@@ -458,9 +485,9 @@ const getDate = async(ctx, next, str, num) => {
 
     } else {
         ctx.body = {
-            data: null,
-            msg: '失败',
-            success: false
+            data: [],
+            msg: '成功',
+            success: true
         };
     }
 };

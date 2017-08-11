@@ -18,8 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': 'http://10.143.108.100:3002/plugin/api/setBasic',
-        'httpUrl': 'http://10.143.108.100:3002/plugin/api/setHtmlError'
+        'httpUrlBasic': 'http://t1.gomefinance.com.cn/plugin/api/setBasic',
+        'httpUrl': 'http://t1.gomefinance.com/plugin.cn/api/setHtmlError'
     };
 
     var _maq = window._maq || [];
@@ -109,21 +109,18 @@
         var et;
         if (sMsg.indexOf('SyntaxError') > 0) {
             et = 'SyntaxError';
-        }
-        if (sMsg.indexOf('ReferenceError') > 0) {
+        } else if (sMsg.indexOf('ReferenceError') > 0) {
             et = 'ReferenceError';
-        }
-        if (sMsg.indexOf('RangeError') > 0) {
+        }else if (sMsg.indexOf('RangeError') > 0) {
             et = 'RangeError';
-        }
-        if (sMsg.indexOf('TypeError') > 0) {
+        } else if (sMsg.indexOf('TypeError') > 0) {
             et = 'TypeError';
-        }
-        if (sMsg.indexOf('URLError') > 0) {
+        } else if (sMsg.indexOf('URLError') > 0) {
             et = 'URLError';
-        }
-        if (sMsg.indexOf('EvalError') > 0) {
+        }else if (sMsg.indexOf('EvalError') > 0) {
             et = 'EvalError';
+        } else {
+            et = 'Initialize failed';
         }
         return et;
     }
