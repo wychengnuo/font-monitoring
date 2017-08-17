@@ -6,6 +6,7 @@
 const router = require('koa-router')();
 const api = require('./api');
 const andirApi = require('./andirPlugin');
+const addMes = require('./messagePush');
 const user = require('./user');
 const oauth = require('./../oauth/oauth');
 
@@ -73,6 +74,16 @@ router
 
 router
     .get('/plugin/api/andirApi', oauth.pass, andirApi.andirAppPlugin);
+
+
+/**
+ * addMes 消息推送单独提出来
+ */
+
+router
+    .post('/plugin/api/addMessage', oauth.user, addMes.addMessage)
+    .get('/plugin/api/getMessage', oauth.user, addMes.getMessage)
+    .post('/plugin/api/setMessage', oauth.user, addMes.setMessage);
 
 
 

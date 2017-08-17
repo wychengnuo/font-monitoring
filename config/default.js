@@ -77,7 +77,13 @@ module.exports = {
          * 获取下载量字段
          */
 
-        plugDownloads: 'front_sam_zhang_plugDownloads'
+        plugDownloads: 'front_sam_zhang_plugDownloads',
+
+        /**
+         * 消息推送存储字段
+         */
+
+        messagePush: 'front_sam_zhang_messagePush'
     },
 
     /**
