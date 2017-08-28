@@ -9,6 +9,8 @@ const getInterface = require('./utils/logs');
 const existenceTime = require('./server/existenceTime');
 const { corn } = require('./config/default');
 
+app.use(cors());
+
 app
   .use(koaBody({
       multipart: true
@@ -21,9 +23,6 @@ const apiRouter = require('./routers/router');
 
 app.use(apiRouter.routes())
     .use(apiRouter.allowedMethods());
-
-app.use(cors());
-
 
 const redis = require('./server/redis');
 
