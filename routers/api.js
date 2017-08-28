@@ -64,7 +64,7 @@ class ApiController {
 
         const m = JSON.stringify(ctx.request.body);
 
-        editRedis().sadd(keys.msets, m);
+        new editRedis().sadd(keys.msets, m);
 
         new editRedis().rpush(keys.msets+ '_list', m);
 
