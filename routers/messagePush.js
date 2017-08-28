@@ -3,11 +3,15 @@
  * 消息推送
  */
 
-const redis = require('./../server/redis');
-
 const { longTimeKeys } = require('./../config/default');
 
 const moment = require('moment');
+
+/**
+ * @param edit redis
+ */
+
+const editRedis = require('./../module/index');
 
 
 class messagePush {
@@ -27,7 +31,7 @@ class messagePush {
 
         obj.time = moment().format('YYYY-MM-DD HH:mm:ss');
 
-        redis.rpush(longTimeKeys.messagePush, JSON.stringify(obj));
+        new editRedis().rpush(longTimeKeys.messagePush, JSON.stringify(obj));
 
         ctx.body = {
             success: true,
@@ -56,7 +60,7 @@ class messagePush {
             order
         } = ctx.request.body;
 
-        let data = await redis.lrange(longTimeKeys.messagePush, order, order);
+        let data = await new editRedis().lrange(longTimeKeys.messagePush, order, order);
         let d;
 
         d = JSON.parse(data);
@@ -83,7 +87,7 @@ class messagePush {
 
         if (num == '1' || num == '2') {
             
-            redis.lset(longTimeKeys.messagePush, order, JSON.stringify(d));
+            new editRedis().lset(longTimeKeys.messagePush, order, JSON.stringify(d));
 
             ctx.body = {
                 success: true,
@@ -96,7 +100,7 @@ class messagePush {
              * 删除数据库字段
              */
 
-            redis.lrem(longTimeKeys.messagePush, order, data);
+            new editRedis().lrem(longTimeKeys.messagePush, order, data);
             ctx.body = {
                 success: true,
                 msg: '删除成功'
@@ -115,15 +119,15 @@ const paging = async(ctx, keys) => {
     
     let page = ctx.query.page ? ctx.query.page : 1;
     let pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10;
-    const dataLeng = await redis.llen(keys);
+    const dataLeng = await new editRedis().llen(keys);
     let data;
 
     if (dataLeng > 10) {
         page = page * 10 - 10;
         pageSize = (pageSize * ctx.query.page) - 1;
-        data = await redis.lrange(keys, page, pageSize);
+        data = await new editRedis().lrange(keys, page, pageSize);
     } else {
-        data = await redis.lrange(keys, 0, 9);
+        data = await new editRedis().lrange(keys, 0, 9);
     }
 
     if (data) {

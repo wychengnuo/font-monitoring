@@ -10,9 +10,14 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * @param edit redis
+ */
+
+const editRedis = require('./../module/index');
 
 /**
- * 接口暂时统一处理
+ * @param 接口暂时统一处理
  */
 
 class ApiController {
@@ -22,14 +27,14 @@ class ApiController {
 
         const m = JSON.stringify(ctx.request.body);
 
-        const data = await redis.smembers(keys.mset);
+        const data = await new editRedis().smembers(keys.mset);
 
         const isOk = isSet(data, ctx);
 
         if (isOk) {
             if (ctx.request.body) {
 
-                redis.sadd(keys.mset, m);
+                new editRedis().sadd(keys.mset, m);
 
                 ctx.body = {
                     msg: '成功',
@@ -59,9 +64,9 @@ class ApiController {
 
         const m = JSON.stringify(ctx.request.body);
 
-        redis.sadd(keys.msets, m);
+        editRedis().sadd(keys.msets, m);
 
-        redis.rpush(keys.msets+ '_list', m);
+        new editRedis().rpush(keys.msets+ '_list', m);
 
         ctx.body = {
             msg: '成功',
@@ -89,7 +94,7 @@ class ApiController {
 
     // 对返回错误信息进行处理 
     static async getTypeErr(ctx, next) {
-        const d = await redis.smembers(keys.msets);
+        const d = await new editRedis().smembers(keys.msets);
         let a = [];
         for (let i in d) {
             const c = JSON.parse(d[i]);
@@ -104,13 +109,13 @@ class ApiController {
             data: data,
             msg: '成功'
         };
-        await next();
+        // await next();
     }
 
     // 对接口错误信息返回进行处理
 
     static async getUrlErr(ctx, next) {
-        const d = await redis.smembers(keys.errlogs);
+        const d = await new editRedis().smembers(keys.errlogs);
         let a = [];
         for (let i in d) {
             const c = JSON.parse(d[i]);
@@ -129,14 +134,15 @@ class ApiController {
     static async setPlug(ctx, next) {
 
         const m = JSON.stringify(ctx.request.body);
-        const data = await redis.hvals('front_sam_zhang_plugList');
+        const data = await new editRedis().hvals('front_sam_zhang_plugList');
         const isOk = isSet(data, ctx);
 
         if (isOk) {
             if (ctx.request.body) {
 
-                redis.rpush(longTimeKeys.plug, m);
-                redis.hset('front_sam_zhang_plugList', ctx.request.body.account, m);
+                new editRedis().rpush(longTimeKeys.plug, m);
+                
+                new editRedis().hset('front_sam_zhang_plugList', ctx.request.body.account, m);
 
                 ctx.body = {
                     msg: '成功',
@@ -170,7 +176,7 @@ class ApiController {
         const value = ctx.request.body.account;
 
         if (value) {
-            const num = await redis.hdel('front_sam_zhang_plugList', value);
+            const num = await new editRedis().hdel('front_sam_zhang_plugList', value);
             if (num === 1) {
                 return ctx.body = {
                     success: true,
@@ -200,7 +206,7 @@ class ApiController {
 
         if (ctx.request.body.plugName) {
 
-            redis.hset(ctx.request.body.category, ctx.request.body.plugName, m);
+            new editRedis().hset(ctx.request.body.category, ctx.request.body.plugName, m);
 
             ctx.body = {
                 msg: '成功',
@@ -285,7 +291,7 @@ class ApiController {
          * 用于分页，供前端分页查看
          */
 
-        redis.rpush(ctx.request.body.fields.name + '_plug', JSON.stringify(o));
+        new editRedis().rpush(ctx.request.body.fields.name + '_plug', JSON.stringify(o));
 
         ctx.redirect(ctx.headers.referer);
 
@@ -316,7 +322,7 @@ class ApiController {
             name
         } = ctx.request.body;
 
-        let data = await redis.lrange(name + '_plug', order, order);
+        let data = await new editRedis().lrange(name + '_plug', order, order);
         let d;
 
         d = JSON.parse(data);
@@ -343,7 +349,7 @@ class ApiController {
 
         if (num == '1' || num == '2') {
 
-            redis.lset(name + '_plug', order, JSON.stringify(d));
+            new editRedis().lset(name + '_plug', order, JSON.stringify(d));
 
             ctx.body = {
                 success: true,
@@ -361,7 +367,7 @@ class ApiController {
             const homeDir = path.resolve(__dirname, '..');
             const newpath = homeDir + '/public/download/' + ctx.request.body.name + '/' + n;
             fs.unlink(newpath);
-            redis.lrem(name + '_plug', order, data);
+            new editRedis().lrem(name + '_plug', order, data);
             ctx.body = {
                 success: true,
                 msg: '删除成功'
@@ -388,7 +394,7 @@ class ApiController {
 
         deleteFolder(newpath);
 
-        const d = await redis.hdel(name, plugName);
+        const d = await new editRedis().hdel(name, plugName);
 
         redis.del(plugName + '_plug');
 
@@ -419,7 +425,7 @@ class ApiController {
             };
         }
 
-        const val = await redis.get(token + '_front_sam_zhang');
+        const val = await new editRedis().get(token + '_front_sam_zhang');
 
         if (!val) {
             ctx.body = {
@@ -470,9 +476,9 @@ const getDate = async(ctx, next, str, num) => {
     let data;
 
     if (num) {
-        data = await redis.hvals(str);
+        data = await new editRedis().hvals(str);
     } else {
-        data = await redis.smembers(str);
+        data = await new editRedis().smembers(str);
     }
 
     if (data && data.length > 0) {
@@ -520,15 +526,15 @@ const paging = async(ctx, keys) => {
 
     let page = ctx.query.page ? ctx.query.page : 1;
     let pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10;
-    const dataLeng = await redis.llen(keys);
+    const dataLeng = await new editRedis().llen(keys);
     let data;
 
     if (dataLeng > 10) {
         page = page * 10 - 10;
         pageSize = (pageSize * ctx.query.page) - 1;
-        data = await redis.lrange(keys, page, pageSize);
+        data = await new editRedis().lrange(keys, page, pageSize);
     } else {
-        data = await redis.lrange(keys, 0, 9);
+        data = await new editRedis().lrange(keys, 0, 9);
     }
 
     if (data) {
@@ -586,7 +592,7 @@ let deleteFolder = (newpath) => {
 const downloads = async (d) => {
     let arr = {};
     return (async () => {
-        const b = d.map(async v => arr[v] = await redis.get(v));
+        const b = d.map(async v => arr[v] = await new editRedis().get(v));
         const c = await Promise.all(b);
         return arr;
     })();

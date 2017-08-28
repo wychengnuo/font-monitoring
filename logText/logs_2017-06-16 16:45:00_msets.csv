@@ -1,2 +1,0 @@
-err_1497583537414
-"{"type":"ÒıÓÃ´íÎó,ReferenceError","sMsg":"Uncaught ReferenceError: fnThre is not defined","sUrl":"file:///Users/zhangsam/it_err/index.html","sLine":17,"sColu":65,"eObj":"ReferenceError: fnThre is not defined\n    at HTMLInputElement.onclick (file:///Users/zhangsam/it_err/index.html:17:65)"}",

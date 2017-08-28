@@ -28,7 +28,7 @@ app.use(cors());
 const redis = require('./server/redis');
 
 app
-    .use(getInterface(redis))
+    .use(getInterface())
     .use(existenceTime(redis));
 /**
  *  redis 监控启动

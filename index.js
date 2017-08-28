@@ -18,8 +18,8 @@
     var packJSON = {
         'jfVersion': '1.0.0',
         'openTime': t,
-        'httpUrlBasic': 'http://t1.gomefinance.com.cn/plugin/api/setBasic',
-        'httpUrl': 'http://t1.gomefinance.com/plugin.cn/api/setHtmlError'
+        'httpUrlBasic': '/plugin/api/setBasic',
+        'httpUrl': '/plugin/api/setHtmlError'
     };
 
     var _maq = window._maq || [];
