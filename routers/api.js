@@ -36,6 +36,8 @@ class ApiController {
 
                 new editRedis().sadd(keys.mset, m);
 
+                new editRedis().rpush(keys.mset + '_l', m);
+
                 ctx.body = {
                     msg: '成功',
                     success: true
@@ -56,7 +58,7 @@ class ApiController {
 
     //获取用户版本信息    
     static async getBasic(ctx, next) {
-        await getDate(ctx, next, keys.mset);
+        await paging(ctx, keys.mset + '_l');
     }
 
     // 存储端页面报错信息
