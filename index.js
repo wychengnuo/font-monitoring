@@ -134,8 +134,30 @@
      */
 
     w.onerror = function geterrorTrap(sMsg, sUrl, sLine, sColu, eObj, err) {
+        
+        //没有URL不上报！上报也不知道错误
+        if (sMsg != 'Script error.' && !sUrl){
+            return true;
+        }
         var eMs = {};
-        eMs.sMsg = sMsg;
+        if (!!err && !!err.stack) { 
+            eMs.sMsg = err.stack.toString();
+        }else if (arguments.callee){
+            //尝试通过callee拿堆栈信息
+            var ext = [];
+            var f = arguments.callee.caller, c = 3;
+            //这里只拿三层堆栈信息
+            while (f && (--c>0)) {
+                ext.push(f.toString());
+                if (f  === f.caller) {
+                    break;//如果有环
+                }
+                f = f.caller;
+            }
+            ext = ext.join(',');
+            eMs.sMsg = err.stack.toString();
+        }
+        // eMs.sMsg = sMsg;
         eMs.sUrl = sUrl;
         eMs.sLine = sLine;
         eMs.sColu = sColu;
