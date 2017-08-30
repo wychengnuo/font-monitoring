@@ -25,6 +25,8 @@ class ApiController {
     // 存储用户版本信息
     static async setBasic(ctx) {
 
+        require('./../utils/browserType')(ctx.headers['user-agent']);
+
         const m = JSON.stringify(ctx.request.body);
 
         const data = await new editRedis().smembers(keys.mset);
@@ -467,6 +469,23 @@ class ApiController {
             };
         }
     }
+
+    /**
+     * 获取浏览器类型
+     */
+
+    static async getBrowser(ctx) {
+
+        const d = await new editRedis().smembers(keys.browserType);
+        
+        const data = await brower(d);
+
+        ctx.body = {
+            success: true,
+            data: data,
+            msg: '成功'
+        };
+    }
 }
 
 /**
@@ -519,6 +538,24 @@ const type = (d) => {
 
     return Object.values(a);
 };
+
+const brower = (d) => {
+    const a = d.reduce((pre, cur) => {
+        const _cur = JSON.parse(cur)['type'];
+        if (pre[_cur]) {
+            pre[_cur].y++;
+        } else {
+            pre[_cur] = {
+                name: _cur,
+                y: 1
+            };
+        }
+        return pre;
+    }, {});
+
+    return Object.values(a);
+};
+
 
 /**
  * 分页处理
