@@ -65,12 +65,9 @@ const brower = async (type) => {
 
     } else {
 
-        if (explorer.indexOf(browType[6]) == -1) {
-
-            obj['type'] = browType[6];
-            
-            new editRedis().sadd(keys.browserType, JSON.stringify(obj));
-        }
+        obj['type'] = browType[6];
+        
+        new editRedis().sadd(keys.browserType, JSON.stringify(obj));
     }
     
 };
