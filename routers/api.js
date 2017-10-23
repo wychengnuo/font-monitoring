@@ -66,21 +66,32 @@ class ApiController {
     // 存储端页面报错信息
     static async setHtmlError(ctx) {
 
-        const m = JSON.stringify(ctx.request.body);
+        if (!Object.keys(ctx.request.body).length) {
+            
+            ctx.body = {
+                msg: '失败',
+                success: false
+            };
 
-        new editRedis().sadd(keys.msets, m);
+        } else {
+            
+            const m = JSON.stringify(ctx.request.body);
+            
+            new editRedis().sadd(keys.msets, m);
+    
+            new editRedis().rpush(keys.msets + '_list', m);
+    
+            ctx.body = {
+                msg: '成功',
+                success: true
+            };
+        }
 
-        new editRedis().rpush(keys.msets+ '_list', m);
-
-        ctx.body = {
-            msg: '成功',
-            success: true
-        };
     }
 
     // 获取前端页面报错信息
     static async getHtmlError(ctx, next) {
-        await paging(ctx, keys.msets+ '_list');
+        await paging(ctx, keys.msets + '_list');
 
     }
 
@@ -239,7 +250,6 @@ class ApiController {
          * 存储文件
          */
         
-
         const file = ctx.request.body.files.file;
 
         let version = ctx.request.body.fields.plugVersion;
@@ -445,7 +455,6 @@ class ApiController {
         // await next();
     }
 
-
     /**
      * 获取下载量
      */
@@ -555,7 +564,6 @@ const brower = (d) => {
 
     return Object.values(a);
 };
-
 
 /**
  * 分页处理

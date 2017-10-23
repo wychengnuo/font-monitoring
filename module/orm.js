@@ -139,8 +139,6 @@ class ormModel {
         return redis.keys(...this.args);
     }
 
-
-
 }
 
 module.exports = ormModel;

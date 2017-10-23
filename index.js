@@ -27,16 +27,16 @@
     /**
      *  @param 判断解析_maq 配置
      */
-     
+
     if (_maq) {
         for (var i in _maq) {
             switch (_maq[i][0]) {
-            case '_setAccount':        
-                packJSON.account = _maq[i][1];
-                packJSON.source = _maq[i][2];      
-                break;
-            default:
-                break;
+                case '_setAccount':
+                    packJSON.account = _maq[i][1];
+                    packJSON.source = _maq[i][2];
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -59,9 +59,9 @@
     if (navigator) {
         packJSON.lang = navigator.language || '';
         packJSON.userAgent = navigator.userAgent || '',
-        packJSON.appVersion = navigator.appVersion || '',
-        packJSON.appName = navigator.appName || '',
-        packJSON.platform = navigator.platform || '';
+            packJSON.appVersion = navigator.appVersion || '',
+            packJSON.appName = navigator.appName || '',
+            packJSON.platform = navigator.platform || '';
     }
 
     /**
@@ -92,9 +92,10 @@
             var v = localStorage.getItem(key);
             return v === undefined ? null : v;
         },
-        remove: function (key, bool) {
-            if (!bool)
-                localStorage.removeItem(key);
+        remove: function (key) {
+            if (!key)
+                return;
+            clearlocal(key);
         },
         clear: function () {
             localStorage.clear();
@@ -111,13 +112,13 @@
             et = 'SyntaxError';
         } else if (sMsg.indexOf('ReferenceError') > 0) {
             et = 'ReferenceError';
-        }else if (sMsg.indexOf('RangeError') > 0) {
+        } else if (sMsg.indexOf('RangeError') > 0) {
             et = 'RangeError';
         } else if (sMsg.indexOf('TypeError') > 0) {
             et = 'TypeError';
         } else if (sMsg.indexOf('URLError') > 0) {
             et = 'URLError';
-        }else if (sMsg.indexOf('EvalError') > 0) {
+        } else if (sMsg.indexOf('EvalError') > 0) {
             et = 'EvalError';
         } else {
             et = 'Initialize failed';
@@ -133,31 +134,31 @@
      * @param {Object}  eObj   错误的详细信息，Anything
      */
 
-    w.onerror = function geterrorTrap(sMsg, sUrl, sLine, sColu, eObj, err) {
-        
+    w.onerror = function geterrorTrap(sMsg, sUrl, sLine, sColu, eObj) {
+
         //没有URL不上报！上报也不知道错误
-        if (sMsg != 'Script error.' && !sUrl){
+        if (sMsg === 'Script error.' && !sUrl) {
             return true;
         }
         var eMs = {};
-        if (!!err && !!err.stack) { 
-            eMs.sMsg = err.stack.toString();
-        }else if (arguments.callee){
+        if (!eObj && !eObj.stack) {
+            eMs.sMsg = eObj.stack.toString();
+        } else if (arguments.callee) {
             //尝试通过callee拿堆栈信息
             var ext = [];
-            var f = arguments.callee.caller, c = 3;
+            var f = arguments.callee.caller,
+                c = 3;
             //这里只拿三层堆栈信息
-            while (f && (--c>0)) {
+            while (f && (--c > 0)) {
                 ext.push(f.toString());
-                if (f  === f.caller) {
-                    break;//如果有环
+                if (f === f.caller) {
+                    break; //如果有环
                 }
                 f = f.caller;
             }
             ext = ext.join(',');
-            eMs.sMsg = err.stack.toString();
+            eMs.sMsg = eObj.stack.toString();
         }
-        // eMs.sMsg = sMsg;
         eMs.sUrl = sUrl;
         eMs.sLine = sLine;
         eMs.sColu = sColu;
@@ -189,12 +190,13 @@
                 eObj: o.eObj ? o.eObj.stack : ''
             };
             var d = JSON.stringify(data);
-            var t = 'err_' + (new Date() - 0);
+            var t = o.sMsg.split(':')[1].replace(/\s+/g, '');
+            t = t.substr(0, t.length / 2);
 
             /**
              * 这里有个问题，已经存在的、相同的问题也统计了（）
              */
-            ls.set(t, d);
+            ls.set('err_' + t, d);
         }
     }
 
@@ -229,8 +231,8 @@
             }
             // 如果支持navigator.connection
         } else if (con) {
-            var network = con.type;
-            if (network != 'wifi' && network != '2' && network != 'unknown') { // unknown是为了兼容Chrome Canary
+            var network = con.effectiveType;
+            if (network != 'wifi' && network != '4g' && network != 'unknown') { // unknown是为了兼容Chrome Canary
                 wifi = false;
             }
         }
@@ -244,28 +246,32 @@
      * @param request 
      */
 
+    var request = new XMLHttpRequest();
+
     var Ajax = {
         get: function (url, fn) {
-            var obj = new XMLHttpRequest(); // XMLHttpRequest对象用于在后台与服务器交换数据          
-            obj.open('GET', url, true);
-            obj.onreadystatechange = function () {
-                if (obj.readyState == 4 && obj.status == 200 || obj.status == 304) { // readyState==4说明请求已完成                    
-                    fn.call(this, obj.responseText); //从服务器获得数据
+            request.open('GET', url, true);
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200 || request.status == 304) { // readyState==4说明请求已完成                    
+                    fn.call(this, request.responseText); //从服务器获得数据
+                    console.log('调用成功', url);
                 }
+                console.log('调用不成功，url地址不对或者服务有问题或者网络问题。', url);
             };
-            obj.send(null);
+            request.send(null);
         },
         post: function (url, data, fn) {
-            var obj = new XMLHttpRequest();
-            obj.open('post', url, true);
-            obj.setRequestHeader('Content-type', 'application/json'); // 发送信息至服务器时内容编码类型
-            obj.onreadystatechange = function () {
-                if (obj.readyState == 4 && (obj.status == 200 || obj.status == 304)) { // 304未修改
+            request.open('post', url, true);
+            request.setRequestHeader('Content-type', 'application/json'); // 发送信息至服务器时内容编码类型
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && (request.status == 200 || request.status == 304)) { // 304未修改
                     if (fn)
-                        fn.call(this, obj.responseText);
+                        fn.call(this, request.responseText);
+                    console.log('调用成功', url);
                 }
+                console.log('调用不成功，url地址不对或者服务有问题或者网络问题。', url);
             };
-            obj.send(data);
+            request.send(data);
         }
     };
 
@@ -274,14 +280,13 @@
      */
 
     function screening(obj) {
-        
-        var o;
+
+        var o = {};
         if (obj === 'undefied' && typeof obj !== 'object') {
             return;
         }
         for (var i in obj) {
             if (i.charAt(1) === 'r') {
-                o = {};
                 o[i] = obj[i];
             }
         }
@@ -289,11 +294,24 @@
     }
 
     /**
+     * @param 清除已经上传的数据
+     */
+
+    function clearlocal(key) {
+        if (key === 'undefied' && typeof key !== 'object') {
+            return;
+        }
+        for (var i in key) {
+            localStorage.removeItem(i);
+        }
+    }
+
+    /**
      * @param 数据交互，前端发送的
      */
-     
+
     var localData = screening(localStorage);
-    
+
     var dataBody = {
         'account': packJSON.account,
         'jfVersion': packJSON.jfVersion,
@@ -314,15 +332,21 @@
     };
     dataBody = JSON.stringify(dataBody);
     var dataErrorBody = JSON.stringify(localData);
+
+    var isSendData = netState();
+
+    // if (isSendData) {
     Ajax.post(packJSON.httpUrlBasic, dataBody);
     if (typeof dataErrorBody !== 'undefined') {
         Ajax.post(packJSON.httpUrl, dataErrorBody, function (data) {
             var date = JSON.parse(data);
-            if (date.success) {
-                ls.clear();
+            if (date.success) { //成功以后删除相应的文件
+                ls.remove(localData);
             }
-        });   
+        });
     }
-
+    // } else {
+    //     alert('网络不好！');
+    // }
 
 })();

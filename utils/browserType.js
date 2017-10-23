@@ -30,7 +30,7 @@ const brower = async (type) => {
     //firefox 
     else if (explorer.indexOf(browType[1]) >= 0) {
 
-        obj['type'] = time;
+        obj['type'] = browType[1];
 
 
         new editRedis().sadd(keys.browserType, JSON.stringify(obj));    
