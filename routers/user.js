@@ -8,6 +8,12 @@ const {
 } = require('./../config/default');
 const moment = require('moment');
 
+/**
+ * @param edit redis
+ */
+
+const editRedis = require('./../module/index');
+
 class ApiUser {
 
     // 用户注册
@@ -28,9 +34,9 @@ class ApiUser {
 
         const token = crypt.creatToken(d);
 
-        redis.hset(register.register, d.username, JSON.stringify(d));
+        new editRedis().hset(register.register, d.username, JSON.stringify(d));
 
-        redis.set(token + '_front_sam_zhang', d.password, 'EX', t.time);
+        new editRedis().set(token, d.password, 'EX', t.time);
 
         ctx.cookies.set('token', token);
 
@@ -51,7 +57,7 @@ class ApiUser {
 
             const token = crypt.creatToken(user);
 
-            redis.set(token + '_front_sam_zhang', user.username, 'EX', t.time);
+            new editRedis().set(token, user.username, 'EX', t.time);
 
             ctx.cookies.set('token', token);
 
@@ -68,7 +74,7 @@ class ApiUser {
 
                 const tdata = crypt.creatToken(d);
 
-                redis.set(tdata + '_front_sam_zhang', d.username, 'EX', t.time);
+                new editRedis().set(tdata, d.username, 'EX', t.time);
 
                 ctx.cookies.set('token', tdata);
 
@@ -101,7 +107,7 @@ class ApiUser {
                 success: true
             };
         }
-        redis.get(token + '_front_sam_zhang').then(function (value) {
+        new editRedis().get(token + '_front_sam_zhang').then(function (value) {
 
             redis.del(token + '_front_sam_zhang');
             redis.del(value);
@@ -124,7 +130,7 @@ class ApiUser {
 
         if (token) {
 
-            const userinfo = await redis.get(token + '_front_sam_zhang');
+            const userinfo = await new editRedis().get(token + '_front_sam_zhang');
 
             /**
              * 直接写死zhangsam超级账户
@@ -142,7 +148,7 @@ class ApiUser {
                 };
             }
 
-            let data = await redis.hget(register.register, userinfo);
+            let data = await new editRedis().hget(register.register, userinfo);
 
             data = JSON.parse(data);
 
@@ -176,7 +182,7 @@ const isRegister = async(ctx) => {
 
     const data = ctx.request.body;
 
-    const d = await redis.hget(register.register, data.username);
+    const d = await new editRedis().hget(register.register, data.username);
 
     if (d) {
         return d;

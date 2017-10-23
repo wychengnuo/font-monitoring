@@ -14,6 +14,13 @@ const { longTimeKeys } = require('./../config/default');
 const cronJob = require('cron').CronJob;
 
 /**
+ * @param edit redis
+ */
+
+const editRedis = require('./../module/index');
+
+
+/**
  * 1、全部用户
  * 2、部分用户
  * 3、独立用户
@@ -27,7 +34,7 @@ module.exports = function (server) {
         
         socket.on('ferret', async (name, fn) => {
             let obj = {};
-            let data = await redis.lrange(longTimeKeys.messagePush, name, name);
+            let data = await new editRedis().lrange(longTimeKeys.messagePush, name, name);
             data = JSON.parse(data);
             if (data.isEnable == 'true') {
                 obj = {
@@ -57,7 +64,7 @@ module.exports = function (server) {
 
         // socket.on('realtime', async (name, fn) => {
             
-        //     let data = await redis.lrange(longTimeKeys.messagePush, 0, -1);
+        //     let data = await new editRedis().lrange(longTimeKeys.messagePush, 0, -1);
         //     let d = data.map(JSON.parse);
         //     let e = d.filter(e => Boolean(Number(e.timeSwitch)) && e.isEnable == 'true');
 

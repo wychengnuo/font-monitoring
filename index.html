@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--<script src='./management/js/socket.js' ></script>-->
     <!--<script src="error.js"></script>-->
-    <script src="index.js">
+    <!-- <script src="index.js"> -->
     </script>
 </head>
 
@@ -30,14 +30,15 @@
             // });
 
             window._maq = window._maq || [];
-            _maq.push(['_setAccount', '刘凯', 'h5']);
+            _maq.push(['_setAccount', 'licai', 'h5']);
 
             (function() {
                 var ma = document.createElement('script'); ma.type = 'text/javascript'; ma.async = true;
-                ma.src = ('https:' == document.location.protocol ? 'http://10.143.108.100:3002' : 'http://10.143.108.100:3002') + '/goindex.min.js';
+                // ma.src = ('https:' == document.location.protocol ? 'http://localhost:3002' : 'http://localhost:3002') + '/goindex.min.js';
+                ma.src = ('https:' == document.location.protocol ? 'http://localhost:3002' : 'http://localhost:3002') + '/index.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ma, s);
             })();
-        </script>
+        // </script>
 </body>
 
 </html>

@@ -65,7 +65,8 @@ router
     .get('/plugin/api/getPlugListInfo', oauth.pass, api.getPlugListInfo)
     .post('/plugin/api/delPlug', oauth.pass, api.delPlug)
     .get('/plugin/api/getPlugDownloads', oauth.pass, api.getPlugDownloads)
-    .post('/plugin/api/isLogin', api.isLogin);
+    .post('/plugin/api/isLogin', api.isLogin)
+    .get('/plugin/api/getBrowser', oauth.user, api.getBrowser);
 
 
 /**

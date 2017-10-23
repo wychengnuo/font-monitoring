@@ -5,7 +5,13 @@ const { host } = require('./../config/default');
 const os = require('os');
 
 const networkInterfaces = os.networkInterfaces();
-const eth0 = (networkInterfaces.eth0 || networkInterfaces.en0).filter(i=> i.family === 'IPv4');
+const eth0 = (networkInterfaces.eth0 || networkInterfaces.en0).filter(i => i.family === 'IPv4');
+
+/**
+ * @param edit redis
+ */
+
+const editRedis = require('./../module/index');
 
 class andirApiController {
 
@@ -19,7 +25,7 @@ class andirApiController {
          * 第一步： 从数据库中查询到项目
          */
 
-        const data = await redis.keys('*_plug');
+        const data = await new editRedis().keys('*_plug');
 
         /**
          * 第二步： 对返回数据进行格式处理
@@ -76,13 +82,13 @@ const list = async (data) => {
          */
 
         return (async () => {
-            const b = data.map(async v => await redis.lrange(v, 0, -1));
+            const b = data.map(async v => await new editRedis().lrange(v, 0, -1));
             const c = await Promise.all(b);
             return c;
         })();
 
     } else {
-        return data.reduce(async (pre, cur) => await redis.lrange(cur, 0, -1), []);
+        return data.reduce(async (pre, cur) => await new editRedis().lrange(cur, 0, -1), []);
     }
 
 };

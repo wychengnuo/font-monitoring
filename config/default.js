@@ -10,6 +10,18 @@ module.exports = {
         family: 4,               // 4 (IPv4) or 6 (IPv6)
         password: ''           // password 
     },
+
+    // redis: {
+    //     sentinels: [
+    //                {
+    //            port: 26379,             // Redis port
+    //            host: '10.143.108.96',   // Redis host
+    //            family: 4               // 4 (IPv4) or 6 (IPv6)
+    //         }
+    //     ],
+    //     password: 't1',           // password
+    //     name:'mymaster'
+    // },
     
     /**
      * 哨兵启动
@@ -53,7 +65,13 @@ module.exports = {
          * errlogs: 接口分页处理
          */
 
-        pageError: 'front_sam_zhang_pageError'
+        pageError: 'front_sam_zhang_pageError',
+        
+        /**
+         * 主要浏览器类型存储字段
+         */
+
+        browserType: 'front_sam_zhang_browserType'
     },
 
     /**

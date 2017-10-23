@@ -1,12 +1,12 @@
 
 /**
- * 对前端请求进行拦截，实现一个最垃圾的拦截器
- * 权限控制
- * 1、直接通过，不需要登录    pass
- * 2、需要登录， user
+ * @param 对前端请求进行拦截，实现一个最垃圾的拦截器
+ * @param 权限控制
+ * @param 1、直接通过，不需要登录    pass
+ * @param 2、需要登录， user
  */
 
-const redis = require('./../server/redis');
+const editRedis = require('./../module/index');
 
 class oauth {
 
@@ -33,7 +33,7 @@ class oauth {
             };
         }
 
-        const val = await redis.get(token + '_front_sam_zhang');
+        const val = await new editRedis().get(token + '_front_sam_zhang');
         
         if (!val) {
             ctx.body = {

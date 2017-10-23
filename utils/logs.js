@@ -5,25 +5,27 @@
  * 张Sam
  */
 
+const editRedis = require('./../module/index');
+
 const humanize = require('humanize-number');
 const keys = require('./../config/default').keys;
 
-function getInterface(redis) { 
+function getInterface() { 
     
     return async function b(ctx, next) {
         const start = new Date();
         try {
             await next();
         } catch (err) {
-            loggers(ctx, start, redis, err);
+            loggers(ctx, start, err);
             console.log(err);
             throw err;
         } 
-        loggers(ctx, start, redis);
+        loggers(ctx, start);
     };
 }
 
-function loggers(ctx, start, redis, err) {
+function loggers(ctx, start, err) {
     const t = time(start);
     const status = err ? (err.status || 500) : (ctx.status || 404);
     const o = {};
@@ -35,8 +37,8 @@ function loggers(ctx, start, redis, err) {
     if (ctx.originalUrl !== '/__webpack_hmr' && status != '400' && status != '404' && status != '200') {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
         let n = JSON.stringify(o);
-        redis.sadd(keys.errlogs, n);
-        redis.rpush(keys.pageError, n);
+        new editRedis().sadd(keys.errlogs, n);
+        new editRedis().rpush(keys.pageError, n);
     }
 }
 
