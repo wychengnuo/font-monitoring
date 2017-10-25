@@ -187,7 +187,9 @@
                 sUrl: o.sUrl,
                 sLine: o.sLine,
                 sColu: o.sColu,
-                eObj: o.eObj ? o.eObj.stack : ''
+                eObj: o.eObj ? o.eObj.stack : '',
+                sTime: getTime.getTime(),
+                browerType: '$1'
             };
             var d = JSON.stringify(data);
             var t = o.sMsg.split(':')[1].replace(/\s+/g, '');
