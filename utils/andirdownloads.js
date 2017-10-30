@@ -5,22 +5,39 @@
  * @param 2、总下载量
  */
 
-const { longTimeKeys } = require('./../config/default');
-
 const editRedis = require('./../module/index');
 
-module.exports = async (channl, next) => {
+module.exports = async (ctx, channl, homeDir,  next) => {
 
     /**
      * 检查redis是否存在channl
      */
 
     if (channl) {
-        if (!await new editRedis().get(longTimeKeys.plugDownloads + '_' + channl)) {
-            new editRedis().downSet(longTimeKeys.plugDownloads + '_' + channl, 0);
-        }
+        let name = homeDir.split('/')[homeDir.split('/').length - 2];
 
-        new editRedis().downSet(longTimeKeys.plugDownloads + '_' + channl);
+        // name = homeDir, sum += 1;
+
+        let a = await new editRedis().getPlugAnListInfoId(name);
+
+        a = !a ? {} : a;
+
+        let b = await new editRedis().getPlugDownId(channl);
+
+        b = !b ? {} : b;
+
+        if (a.id) {
+            if (b.name == channl) { 
+                new editRedis().updatePlugDownId(b);
+            } else {
+                new editRedis().plugDown(channl, a.id);
+            }
+        }
+        await next();
     }
+    ctx.body = {
+        success: false,
+        data: '不知道为啥，请求头字段暂不能为中文'
+    };
     
 };
