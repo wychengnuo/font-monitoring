@@ -3,8 +3,6 @@
  * 消息推送
  */
 
-const { longTimeKeys } = require('./../config/default');
-
 const moment = require('moment');
 
 /**

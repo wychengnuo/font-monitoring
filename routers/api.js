@@ -1,10 +1,4 @@
-const isSet = require('./../utils/isSet');
-const {
-    keys,
-    longTimeKeys
-} = require('./../config/default');
 
-const redis = require('./../server/redis');
 const moment = require('moment');
 
 const fs = require('fs');
