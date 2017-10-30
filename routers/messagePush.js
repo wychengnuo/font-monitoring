@@ -24,14 +24,13 @@ class messagePush {
 
         let obj = ctx.request.body;
 
-
         /**
          * 创建时间
          */
 
         obj.time = moment().format('YYYY-MM-DD HH:mm:ss');
 
-        new editRedis().rpush(longTimeKeys.messagePush, JSON.stringify(obj));
+        new editRedis().messPush(obj);
 
         ctx.body = {
             success: true,
@@ -46,7 +45,8 @@ class messagePush {
 
     static async getMessage(ctx, next) {
 
-        await paging(ctx, longTimeKeys.messagePush);
+        await paging(ctx, 'messPush');
+        await next();
     }
 
     /**
@@ -55,27 +55,19 @@ class messagePush {
     
     static async setMessage(ctx, next) {
 
-        const {
-            num,
-            order
-        } = ctx.request.body;
-
-        let data = await new editRedis().lrange(longTimeKeys.messagePush, order, order);
-        let d;
-
-        d = JSON.parse(data);
-        d.time = moment().format('YYYY-MM-DD HH:mm:ss');
-
+        const { num, id } = ctx.request.body;
+        
+        let isEnable = {};
+        
         if (num == '1') {
-
-            d.isEnable = 'true';
-
+        
+            isEnable.isEnable = true;
+        
         } else if (num == '2') {
-
-            d.isEnable = 'false'; // 是否停用
-
+        
+            isEnable.isEnable = false; // 是否停用
+        
         }
-
         /**
          * 根据num 来区分功能
          * 1、启用
@@ -87,12 +79,11 @@ class messagePush {
 
         if (num == '1' || num == '2') {
             
-            new editRedis().lset(longTimeKeys.messagePush, order, JSON.stringify(d));
-
-            ctx.body = {
+            await new editRedis().updateMessage(id, isEnable);
+            
+            return ctx.body = {
                 success: true,
-                msg: '操作成功',
-                data: data
+                msg: '操作成功'
             };
         } else {
 
@@ -100,12 +91,14 @@ class messagePush {
              * 删除数据库字段
              */
 
-            new editRedis().lrem(longTimeKeys.messagePush, order, data);
+            new editRedis().deleteMessageId(id);
             ctx.body = {
                 success: true,
                 msg: '删除成功'
             };
         }
+
+        await next();
 
     }
 }
@@ -115,37 +108,28 @@ class messagePush {
  * 分页处理
  */
 
-const paging = async(ctx, keys) => {
+const paging = async(ctx) => {
     
-    let page = ctx.query.page ? ctx.query.page : 1;
-    let pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10;
-    const dataLeng = await new editRedis().llen(keys);
-    let data;
-
-    if (dataLeng > 10) {
-        page = page * 10 - 10;
-        pageSize = (pageSize * ctx.query.page) - 1;
-        data = await new editRedis().lrange(keys, page, pageSize);
-    } else {
-        data = await new editRedis().lrange(keys, 0, 9);
-    }
-
-    if (data) {
+    let currentPage = ctx.query.page ? ctx.query.page : 1;
+    let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
+    
+    let data = await new editRedis().messageFindAll(Number(currentPage), Number(countPerPage));
+    
+    if (data.rows) {
         ctx.body = {
             success: true,
-            data: data,
+            data: data.rows,
             msg: '成功',
-            pageSize: Math.ceil(dataLeng / 10)
+            pageSize: Math.ceil(data.count / Number(countPerPage))
         };
     } else {
         ctx.body = {
             success: false,
             data: {},
-            msg: '失败',
-            pageSize: 0
+            msg: '失败'
         };
     }
-
+    
 };
     
 
