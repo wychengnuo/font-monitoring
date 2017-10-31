@@ -74,16 +74,18 @@ class ApiController {
             };
 
         } else {
-            
-            const m = JSON.stringify(ctx.request.body);
-            
+            const object = ctx.request.body;
+            let m = JSON.stringify(object);
+            const browerType = require('./../utils/getBrowserType')(ctx.headers['user-agent']);
+            m = m.replace(/\$1/g, browerType)
             new editRedis().sadd(keys.msets, m);
-    
+
             new editRedis().rpush(keys.msets + '_list', m);
     
             ctx.body = {
                 msg: '成功',
-                success: true
+                success: true,
+                body: ctx.request.body
             };
         }
 
@@ -589,7 +591,8 @@ const paging = async(ctx, keys) => {
             success: true,
             data: data,
             msg: '成功',
-            pageSize: Math.ceil(dataLeng / 10)
+            pageSize: Math.ceil(dataLeng / 10),
+            length: dataLeng
         };
     } else {
         ctx.body = {
