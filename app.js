@@ -62,13 +62,13 @@ app.use(async (ctx, next) => {
      * 兼容api不走下载
      */
 
-    if (ctx.originalUrl.indexOf('api') == -1) {
+    if (ctx.originalUrl.indexOf('/public/download') == 0) {
 
         try {
             const homeDir = decodeURIComponent(ctx.path);
             let filePath = path.join(__dirname, homeDir);
             const channl = ctx.headers['channel_code'];
-            require('./utils/andirdownloads')(channl, next);
+            require('./utils/andirdownloads')(ctx, channl, homeDir, next);
             ctx.response.attachment(filePath);
 
         } catch (error) {
