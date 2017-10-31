@@ -17,7 +17,7 @@ const { longTimeKeys } = require('./../config/default');
  * @param edit redis
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 
 /**
@@ -34,7 +34,7 @@ module.exports = function (server) {
         
         socket.on('ferret', async (name, fn) => {
             let obj = {};
-            let data = await new editRedis().lrange(longTimeKeys.messagePush, name, name);
+            let data = await new editMysql().lrange(longTimeKeys.messagePush, name, name);
             data = JSON.parse(data);
             if (data.isEnable == 'true') {
                 obj = {
@@ -64,7 +64,7 @@ module.exports = function (server) {
 
         // socket.on('realtime', async (name, fn) => {
             
-        //     let data = await new editRedis().lrange(longTimeKeys.messagePush, 0, -1);
+        //     let data = await new editMysql().lrange(longTimeKeys.messagePush, 0, -1);
         //     let d = data.map(JSON.parse);
         //     let e = d.filter(e => Boolean(Number(e.timeSwitch)) && e.isEnable == 'true');
 

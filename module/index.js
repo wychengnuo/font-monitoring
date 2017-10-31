@@ -9,7 +9,7 @@
 
 const ormModel = require('./orm');
 
-class editRedis {
+class editMysql {
 
     constructor(...args) {
         this.args = args;
@@ -376,4 +376,4 @@ class editRedis {
    
 }
 
-module.exports = exports = editRedis;
+module.exports = exports = editMysql;

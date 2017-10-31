@@ -9,7 +9,7 @@ const moment = require('moment');
  * @param edit redis
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 
 class messagePush {
@@ -28,7 +28,7 @@ class messagePush {
 
         obj.time = moment().format('YYYY-MM-DD HH:mm:ss');
 
-        new editRedis().messPush(obj);
+        new editMysql().messPush(obj);
 
         ctx.body = {
             success: true,
@@ -77,7 +77,7 @@ class messagePush {
 
         if (num == '1' || num == '2') {
             
-            await new editRedis().updateMessage(id, isEnable);
+            await new editMysql().updateMessage(id, isEnable);
             
             return ctx.body = {
                 success: true,
@@ -89,7 +89,7 @@ class messagePush {
              * 删除数据库字段
              */
 
-            new editRedis().deleteMessageId(id);
+            new editMysql().deleteMessageId(id);
             ctx.body = {
                 success: true,
                 msg: '删除成功'
@@ -111,7 +111,7 @@ const paging = async(ctx) => {
     let currentPage = ctx.query.page ? ctx.query.page : 1;
     let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
     
-    let data = await new editRedis().messageFindAll(Number(currentPage), Number(countPerPage));
+    let data = await new editMysql().messageFindAll(Number(currentPage), Number(countPerPage));
     
     if (data.rows) {
         ctx.body = {
