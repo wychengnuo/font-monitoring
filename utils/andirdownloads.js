@@ -14,7 +14,7 @@ module.exports = async (ctx, channl, homeDir,  next) => {
      */
 
     if (channl) {
-        let name = homeDir.split('/')[homeDir.split('/').length - 2];
+        let name = homeDir.split('/')[homeDir.split('/').length - 3];
 
         // name = homeDir, sum += 1;
 
@@ -33,7 +33,7 @@ module.exports = async (ctx, channl, homeDir,  next) => {
                 new editRedis().plugDown(channl, a.id);
             }
         }
-        await next();
+        // await next();
     }
     ctx.body = {
         success: false,

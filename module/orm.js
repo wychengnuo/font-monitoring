@@ -3,7 +3,7 @@
  * @param rom 通过次类对数据库进行操作
  */
 
-const redis = require('./../server/redis');
+// const redis = require('./../server/redis');
 const db = require('./orm/concat.js');
 
 class ormModel {
