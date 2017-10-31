@@ -285,6 +285,14 @@ class editMysql {
     }
 
     /**
+     * @param 根据id删除下载量统计
+     */
+
+    deletePlugDownId(id) {
+        new ormModel().delPlugAnListInfo('plugDown', id);
+    }
+
+    /**
      * @param 根据id删除长连接信息
      */
 

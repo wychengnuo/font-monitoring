@@ -381,7 +381,7 @@ class ApiController {
             let dt = await new editMysql().getPlugAnListInfoAll(data.id);
             
             dt = dt.filter(v => v.plugName == name);
-
+            new editMysql().deletePlugDownId(dt[0].id);
             new editMysql().deletePlugAnListId(dt[0].id);
             ctx.body = {
                 success: true,

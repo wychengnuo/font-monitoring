@@ -108,7 +108,6 @@ class ApiUser {
     // 获取个人信心接口，只针对注册用户，除配置用户以外
 
     static async userInfo(ctx, next) {
-
         const token = ctx.cookies.get('token');
 
         if (token) {

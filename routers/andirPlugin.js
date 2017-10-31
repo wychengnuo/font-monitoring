@@ -1,4 +1,4 @@
-const redis = require('./../server/redis');
+// const redis = require('./../server/redis');
 
 const { host } = require('./../config/default');
 
@@ -75,20 +75,20 @@ class andirApiController {
         if (arr2.length) {
             ctx.body = {
                 data: {
-                    list: dataAr,
-                    code: '200',
-                    success: true,
-                    msg: '成功'
-                }
+                    list: dataAr
+                },
+                code: '200',
+                success: true,
+                msg: '成功'
             };
         } else {
             ctx.body = {
                 data: {
-                    list: [],
-                    code: '300',
-                    success: false,
-                    msg: '失败'
-                }
+                    list: []
+                },
+                code: '300',
+                success: false,
+                msg: '失败'
             };
         }
         
@@ -103,7 +103,7 @@ const objData = async (arr) => {
         
         return {
             version: d.plugVersion,
-            name: d.plugName.split('_')[0],
+            name: d.name,
             isEnable: d.isEnable,
             fileSize: d.fileSize ? d.fileSize : '0K',
             appVer: d.version,
@@ -111,7 +111,7 @@ const objData = async (arr) => {
             channl: d.channl,
             androidVer: d.systemVer,
             isAll: d.optionsRadios == '0' ? false : true,
-            path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path + '/' + d.name + '/' + d.plugName : '没有地址'
+            path: d.path ? 'http://' + (host || (eth0[0].address + ':3002')) + d.path + '/' + d.name + '/' + d.plugVersion + '/' + d.plugName : '没有地址'
         };
     });
 };

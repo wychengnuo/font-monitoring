@@ -33,15 +33,15 @@ class oauth {
             };
         }
 
-        const val = await new editMysql().selectToken('token', token);
-        
+        const val = await new editMysql().selectToken(token);
+
         if (!val) {
             ctx.body = {
                 msg: '请登录',
                 success: false
             };
         }
-
+        
         await next();
     }
 
