@@ -1,6 +1,6 @@
 
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 const { keys } = require('./../config/default');
 
@@ -20,7 +20,7 @@ const brower = async (type) => {
 
     obj['type'] = browerType;
 
-    new editRedis().sadd(keys.browserType, JSON.stringify(obj));
+    new editMysql().sadd(keys.browserType, JSON.stringify(obj));
 };
 
 module.exports = brower;
