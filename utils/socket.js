@@ -3,7 +3,7 @@
  * socketIo控制
  */
 
-const redis = require('./../server/redis');
+// const redis = require('./../server/redis');
 
 const { longTimeKeys } = require('./../config/default');
 
@@ -11,7 +11,7 @@ const { longTimeKeys } = require('./../config/default');
  * 定时任务执行
  */
 
-const cronJob = require('cron').CronJob;
+// const cronJob = require('cron').CronJob;
 
 /**
  * @param edit redis

@@ -381,7 +381,10 @@ class ApiController {
             
             dt = dt.filter(v => v.plugName == name);
 
+            new editRedis().deletePlugDownId(dt[0].id);
+
             new editRedis().deletePlugAnListId(dt[0].id);
+
             ctx.body = {
                 success: true,
                 msg: '删除成功'
