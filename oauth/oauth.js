@@ -33,7 +33,7 @@ class oauth {
             };
         }
 
-        const val = await new editMysql().get(token + '_front_sam_zhang');
+        const val = await new editMysql().selectToken('token', token);
         
         if (!val) {
             ctx.body = {
