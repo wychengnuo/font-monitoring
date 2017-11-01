@@ -117,8 +117,8 @@ class ormModel {
      * @param 根据name删除插件列表
      */
 
-    deletePlugAnList(str, name) {
-        db[str].destroy({ where: { plugListName: name } });
+    deletePlugAnList(str, id) {
+        db[str].destroy({ where: { id: id } });
     }
 
     /**
@@ -133,16 +133,16 @@ class ormModel {
      * @param 查看分页数据
      */
 
-    findAndCountAll(str, currentPage, countPerPage, id) {
-        return db[str].findAndCountAll({ where: { plugAnListId: id }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
+    findAndCountAll(str, currentPage, countPerPage) {
+        return db[str].findAndCountAll({'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
     }
 
     /**
-     * @param 利用id查看分页数据
+     * @param 根据id分页数据
      */
 
-    idFindAndCountAll(str, currentPage, countPerPage) {
-        return db[str].findAndCountAll({'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
+    idFindAndCountAll(str, currentPage, countPerPage, id) {
+        return db[str].findAndCountAll({where: { plugAnListId: id }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
     }
 
     /**
