@@ -563,7 +563,7 @@ const paging = async(ctx, str, id) => {
 
     let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), id);
 
-    if (data.rows) {
+    if (data.rows.length > 1) {
         ctx.body = {
             success: true,
             data: data.rows,
