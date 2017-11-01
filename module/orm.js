@@ -133,16 +133,16 @@ class ormModel {
      * @param 查看分页数据
      */
 
-    findAndCountAll(str, currentPage, countPerPage, id) {
-        return db[str].findAndCountAll({ where: { plugAnListId: id }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
+    findAndCountAll(str, currentPage, countPerPage) {
+        return db[str].findAndCountAll({'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
     }
 
     /**
-     * @param 利用id查看分页数据
+     * @param 根据id分页数据
      */
 
-    idFindAndCountAll(str, currentPage, countPerPage) {
-        return db[str].findAndCountAll({'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
+    idFindAndCountAll(str, currentPage, countPerPage, id) {
+        return db[str].findAndCountAll({where: { plugAnListId: id }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
     }
 
     /**
