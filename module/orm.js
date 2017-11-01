@@ -117,8 +117,8 @@ class ormModel {
      * @param 根据name删除插件列表
      */
 
-    deletePlugAnList(str, name) {
-        db[str].destroy({ where: { plugListName: name } });
+    deletePlugAnList(str, id) {
+        db[str].destroy({ where: { id: id } });
     }
 
     /**

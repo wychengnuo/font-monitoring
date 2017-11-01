@@ -232,8 +232,8 @@ class editMysql {
      * @param 删除插件数据
      */
     
-    deletePlugAnList(name) {
-        return new ormModel().deletePlugAnList('plugAnList', name);
+    deletePlugAnList(id) {
+        return new ormModel().deletePlugAnList('plugAnList', id);
     }
 
     /**
