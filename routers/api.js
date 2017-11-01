@@ -61,9 +61,11 @@ class ApiController {
         } else {
 
             const data = ctx.request.body;
+            const browerType = require('./../utils/getBrowserType')(ctx.headers['user-agent']);
 
             for (let i in data) {
                 let d = JSON.parse(data[i]);
+                d.browerType = browerType;
                 new editMysql().errorMessageSet(d);
             }
 
@@ -323,7 +325,7 @@ class ApiController {
 
         const data = await new editMysql().getPlugAnListId(plugListName);
 
-        await paging(ctx, 'plugAnListInfo', data.id);
+        await paging(ctx, 'plugAnListInfo', {plugAnListId: data.id});
         await next();
     }
 
@@ -556,12 +558,12 @@ const type = (d) => {
  * 分页处理
  */
 
-const paging = async(ctx, str, id) => {
+const paging = async(ctx, str, where) => {
 
     let currentPage = ctx.query.page ? ctx.query.page : 1;
     let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
 
-    let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), id);
+    let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), where);
 
     if (data.rows) {
         ctx.body = {
