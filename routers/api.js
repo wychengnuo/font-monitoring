@@ -94,17 +94,26 @@ class ApiController {
 
     // 对返回错误信息进行处理 
     static async getTypeErr(ctx, next) {
-        const d = await new editMysql().getErrorMessageSet('errorMessage');
-
-        let a = [];
+        const d = await new editMysql().getErrorMessageCount('errorMessage');
+        
+        let a = [], obj = {};
         for (let i in d) {
-            const c = d[i];
-            a.push(c.type);
+            let array = [];
+            for (let j = 6; j >=0; j--) {
+                let date = moment().subtract(j, 'days').format('YYYY-MM-DD')
+
+                if (date == d[i].sTime) {
+                    array.push(d[i].count)
+                } else {
+                    array.push(0)
+                }
+            }
+
+            obj[d[i].type] = array;
         }
-        const data = await type(a);
         ctx.body = {
             success: true,
-            data: data,
+            data: obj,
             msg: '成功'
         };
         await next();
