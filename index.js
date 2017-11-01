@@ -194,7 +194,7 @@
                 sColu: o.sColu,
                 eObj: o.eObj ? o.eObj.stack : '',
                 sTime: getTime.getTime(),
-                browerType: 'google'
+                browerType: '$1'
             };
             var d = JSON.stringify(data);
             var t = !o.sMsg ? '' : o.sMsg.split(':')[1].replace(/\s+/g, '');

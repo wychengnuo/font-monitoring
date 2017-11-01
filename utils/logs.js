@@ -5,7 +5,7 @@
  * 张Sam
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 const humanize = require('humanize-number');
 const moment = require('moment');
@@ -35,7 +35,7 @@ function loggers(ctx, start, err) {
     o.time = moment().format('YYYY-MM-DD HH:mm:ss');
     if (ctx.originalUrl !== '/__webpack_hmr' && status != '400' && status != '404' && status != '200') {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
-        new editRedis().netMessageSet(o);
+        new editMysql().netMessageSet(o);
     }
 }
 

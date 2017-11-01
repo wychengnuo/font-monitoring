@@ -5,7 +5,7 @@
  * @param 2、总下载量
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 module.exports = async (ctx, channl, homeDir,  next) => {
 
@@ -18,19 +18,19 @@ module.exports = async (ctx, channl, homeDir,  next) => {
 
         // name = homeDir, sum += 1;
 
-        let a = await new editRedis().getPlugAnListInfoId(name);
+        let a = await new editMysql().getPlugAnListInfoId(name);
 
         a = !a ? {} : a;
 
-        let b = await new editRedis().getPlugDownId(channl);
+        let b = await new editMysql().getPlugDownId(channl);
 
         b = !b ? {} : b;
 
         if (a.id) {
             if (b.name == channl) { 
-                new editRedis().updatePlugDownId(b);
+                new editMysql().updatePlugDownId(b);
             } else {
-                new editRedis().plugDown(channl, a.id);
+                new editMysql().plugDown(channl, a.id);
             }
         }
         // await next();

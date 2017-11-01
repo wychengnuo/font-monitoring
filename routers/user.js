@@ -17,7 +17,7 @@ const moment = require('moment');
  * 
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 class ApiUser {
 
@@ -37,9 +37,9 @@ class ApiUser {
 
         const token = crypt.creatToken(d);
 
-        const data = await new editRedis().userSet(d.username, d.nickname, d.password);
+        const data = await new editMysql().userSet(d.username, d.nickname, d.password);
 
-        new editRedis().tokenSet(token, data.id);
+        new editMysql().tokenSet(token, data.id);
 
         ctx.cookies.set('token', token);
 
@@ -62,7 +62,7 @@ class ApiUser {
 
                 const tdata = crypt.creatToken(d);
 
-                new editRedis().tokenSet(tdata, isRegist.id);
+                new editMysql().tokenSet(tdata, isRegist.id);
 
                 ctx.cookies.set('token', tdata);
 
@@ -95,7 +95,7 @@ class ApiUser {
                 success: true
             };
         }
-        new editRedis().userLayout(token);
+        new editMysql().userLayout(token);
 
         ctx.cookies.set('token', '');
 
@@ -108,13 +108,12 @@ class ApiUser {
     // 获取个人信心接口，只针对注册用户，除配置用户以外
 
     static async userInfo(ctx, next) {
-
         const token = ctx.cookies.get('token');
 
         if (token) {
 
-            const a = await new editRedis().selectToken(token);
-            const b = await new editRedis().selectTokenIdUser(a.userId);
+            const a = await new editMysql().selectToken(token);
+            const b = await new editMysql().selectTokenIdUser(a.userId);
 
             const time = b.createdAt;
 
@@ -152,7 +151,7 @@ const isRegister = async(ctx) => {
 
     const data = ctx.request.body;
 
-    const d = await new editRedis().selectUser(data.username);
+    const d = await new editMysql().selectUser(data.username);
 
     if (d) {
         return d;

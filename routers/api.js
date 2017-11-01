@@ -8,7 +8,7 @@ const path = require('path');
  * @param edit redis
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 /**
  * @param 接口暂时统一处理
@@ -21,13 +21,13 @@ class ApiController {
 
         require('./../utils/browserType')(ctx.headers['user-agent']);
 
-        let data = await new editRedis().getBrowerSet(ctx.request.body.account);
+        let data = await new editMysql().getBrowerSet(ctx.request.body.account);
 
         data = !data ? {} : data;
  
         if (ctx.request.body.account != data.account) {
 
-            new editRedis().browerSet(ctx.request.body);
+            new editMysql().browerSet(ctx.request.body);
             
             ctx.body = {
                 msg: '成功',
@@ -64,12 +64,13 @@ class ApiController {
 
             for (let i in data) {
                 let d = JSON.parse(data[i]);
-                new editRedis().errorMessageSet(d);
+                new editMysql().errorMessageSet(d);
             }
 
             ctx.body = {
                 msg: '成功',
-                success: true
+                success: true,
+                body: ctx.request.body
             };
         }
         await next();
@@ -91,7 +92,7 @@ class ApiController {
 
     // 对返回错误信息进行处理 
     static async getTypeErr(ctx, next) {
-        const d = await new editRedis().getErrorMessageSet('errorMessage');
+        const d = await new editMysql().getErrorMessageSet('errorMessage');
 
         let a = [];
         for (let i in d) {
@@ -110,7 +111,7 @@ class ApiController {
     // 对接口错误信息返回进行处理
 
     static async getUrlErr(ctx, next) {
-        const d = await new editRedis().getErrorMessageSet('netErrorMessage');
+        const d = await new editMysql().getErrorMessageSet('netErrorMessage');
         
         let a = [];
         for (let i in d) {
@@ -130,13 +131,13 @@ class ApiController {
     static async setPlug(ctx, next) {
 
         const m = ctx.request.body;
-        let data = await new editRedis().getPlugAn(m.account);
+        let data = await new editMysql().getPlugAn(m.account);
 
         data = !data ? {} : data;
 
         if (data.plugName != m.account) {
 
-            new editRedis().plugAnSet(m);
+            new editMysql().plugAnSet(m);
             
             ctx.body = {
                 msg: '成功',
@@ -155,7 +156,7 @@ class ApiController {
 
     static async getPlug(ctx, next) {
 
-        const data = await new editRedis().getPlugAnAll();
+        const data = await new editMysql().getPlugAnAll();
         
         if (data && data.length > 0) {
     
@@ -184,9 +185,9 @@ class ApiController {
 
         if (m.plugName) {
 
-            const data = await new editRedis().getPlugAn(m.category);
+            const data = await new editMysql().getPlugAn(m.category);
 
-            new editRedis().plugAnList(m, data.id);
+            new editMysql().plugAnList(m, data.id);
 
             ctx.body = {
                 msg: '成功',
@@ -205,9 +206,9 @@ class ApiController {
 
     static async getPlugList(ctx, next) {
         const str = ctx.query.category;
-        const data = await new editRedis().getPlugAn(str);
+        const data = await new editMysql().getPlugAn(str);
 
-        const d = await new editRedis().getPlugFindAndCountAll(data.id);
+        const d = await new editMysql().getPlugFindAndCountAll(data.id);
         
         if (d && d.length > 0) {
             
@@ -298,13 +299,13 @@ class ApiController {
          * 用于分页，供前端分页查看
          */
 
-        let data = await new editRedis().getPlugAnListId(ctx.request.body.fields.name);
+        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name);
 
         data = !data ? {} : data;
 
         if (data.id) {
 
-            new editRedis().plugAnListInfo(o, data.id);
+            new editMysql().plugAnListInfo(o, data.id);
         }
 
         ctx.redirect(ctx.headers.referer);
@@ -320,7 +321,7 @@ class ApiController {
 
         const plugListName = ctx.query.category;
 
-        const data = await new editRedis().getPlugAnListId(plugListName);
+        const data = await new editMysql().getPlugAnListId(plugListName);
 
         await paging(ctx, 'plugAnListInfo', data.id);
         await next();
@@ -359,7 +360,7 @@ class ApiController {
 
         if (num == '1' || num == '2') {
 
-            new editRedis().updatePlugAnListId(name, isEnable);
+            new editMysql().updatePlugAnListId(name, isEnable);
 
             ctx.body = {
                 success: true,
@@ -375,16 +376,13 @@ class ApiController {
             const newpath = homeDir + '/public/download/' + pathName + '/' + version + '/' + name;
             fs.unlink(newpath);
 
-            const data = await new editRedis().getPlugAnListId(pathName);
+            const data = await new editMysql().getPlugAnListId(pathName);
 
-            let dt = await new editRedis().getPlugAnListInfoAll(data.id);
+            let dt = await new editMysql().getPlugAnListInfoAll(data.id);
             
             dt = dt.filter(v => v.plugName == name);
-
-            new editRedis().deletePlugDownId(dt[0].id);
-
-            new editRedis().deletePlugAnListId(dt[0].id);
-
+            new editMysql().deletePlugDownId(dt[0].id);
+            new editMysql().deletePlugAnListId(dt[0].id);
             ctx.body = {
                 success: true,
                 msg: '删除成功'
@@ -411,18 +409,18 @@ class ApiController {
          */
 
         deleteFolder(newpath);
-        const data = await new editRedis().getPlugAnListId(plugName);
+        const data = await new editMysql().getPlugAnListId(plugName);
 
-        const dataAll = await new editRedis().getPlugAnListInfoAll(data.id);
+        const dataAll = await new editMysql().getPlugAnListInfoAll(data.id);
 
         if (dataAll.length) {
 
-            await new editRedis().deletePlugAnId(dataAll[0].plugAnListId);
+            await new editMysql().deletePlugAnId(dataAll[0].plugAnListId);
 
-            await new editRedis().deletePlugAnList(plugName);
+            await new editMysql().deletePlugAnList(plugName);
 
         } else {
-            await new editRedis().deletePlugAnList(plugName);
+            await new editMysql().deletePlugAnList(plugName);
         }
 
         ctx.body = {
@@ -447,7 +445,7 @@ class ApiController {
             };
         }
 
-        const val = await new editRedis().selectToken(token);
+        const val = await new editMysql().selectToken(token);
 
         if (!val) {
             ctx.body = {
@@ -468,7 +466,7 @@ class ApiController {
      */
 
     static async getPlugDownloads(ctx, next) {
-        const data = await new editRedis().getErrorMessageSet('plugDown');
+        const data = await new editMysql().getErrorMessageSet('plugDown');
 
         let arr = [];
         let obj = {};
@@ -503,7 +501,7 @@ class ApiController {
 
     // static async getBrowser(ctx, next) {
 
-    //     const d = await new editRedis().smembers(keys.browserType);
+    //     const d = await new editMysql().smembers(keys.browserType);
         
     //     const data = await brower(d);
 
@@ -563,7 +561,7 @@ const paging = async(ctx, str, id) => {
     let currentPage = ctx.query.page ? ctx.query.page : 1;
     let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
 
-    let data = await new editRedis().getFindAllData(str, Number(currentPage), Number(countPerPage), id);
+    let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), id);
 
     if (data.rows) {
         ctx.body = {

@@ -11,7 +11,7 @@ const eth0 = (networkInterfaces.eth0 || networkInterfaces.en0).filter(i => i.fam
  * @param edit redis
  */
 
-const editRedis = require('./../module/index');
+const editMysql = require('./../module/index');
 
 class andirApiController {
 
@@ -26,7 +26,7 @@ class andirApiController {
 
         const { version, channl, systemVer } = ctx.query;
 
-        let data = await new editRedis().getPlugAnListInfoData(version, channl, systemVer);
+        let data = await new editMysql().getPlugAnListInfoData(version, channl, systemVer);
 
         if (!data.length) {
             return ctx.body = {
