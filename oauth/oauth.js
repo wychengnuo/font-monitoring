@@ -33,7 +33,7 @@ class oauth {
             };
         }
 
-        const val = await new editRedis().get(token + '_front_sam_zhang');
+        const val = await new editRedis().selectToken(token);
         
         if (!val) {
             ctx.body = {
