@@ -189,12 +189,22 @@ class ApiController {
 
             const data = await new editMysql().getPlugAn(m.category);
 
-            new editMysql().plugAnList(m, data.id);
+            const dt = await new editMysql().getPlugAnListId(ctx.request.body.plugName);
 
-            ctx.body = {
-                msg: '成功',
-                success: true
-            };
+            if (dt.plugListName == ctx.request.body.plugName) {
+                return ctx.body = {
+                    msg: '插件不能重复命名，请检查插件命名，重新输入。。',
+                    success: false
+                };
+            } else {
+
+                new editMysql().plugAnList(m, data.id);
+
+                return ctx.body = {
+                    msg: '成功',
+                    success: true
+                };
+            }
         } else {
             ctx.body = {
                 msg: '失败',
@@ -321,11 +331,9 @@ class ApiController {
 
     static async getPlugListInfo(ctx, next) {
 
-        const plugListName = ctx.query.category;
+        const id = ctx.query.id;
 
-        const data = await new editMysql().getPlugAnListId(plugListName);
-
-        await paging(ctx, 'plugAnListInfo', {plugAnListId: data.id});
+        await paging(ctx, 'plugAnListInfo', id);
         await next();
     }
 
@@ -383,8 +391,11 @@ class ApiController {
             let dt = await new editMysql().getPlugAnListInfoAll(data.id);
             
             dt = dt.filter(v => v.plugName == name);
+
             new editMysql().deletePlugDownId(dt[0].id);
+
             new editMysql().deletePlugAnListId(dt[0].id);
+            
             ctx.body = {
                 success: true,
                 msg: '删除成功'
@@ -401,6 +412,8 @@ class ApiController {
     static async delPlug(ctx, next) {
 
         const plugName = ctx.request.body.plugName;
+
+        const id = ctx.request.body.id;
 
         const homeDir = path.resolve(__dirname, '..');
 
@@ -422,7 +435,7 @@ class ApiController {
             await new editMysql().deletePlugAnList(plugName);
 
         } else {
-            await new editMysql().deletePlugAnList(plugName);
+            await new editMysql().deletePlugAnList(id);
         }
 
         ctx.body = {
@@ -565,7 +578,7 @@ const paging = async(ctx, str, where) => {
 
     let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), where);
 
-    if (data.rows) {
+    if (data.rows.length) {
         ctx.body = {
             success: true,
             data: data.rows,

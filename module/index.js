@@ -153,7 +153,7 @@ class editMysql {
      */
 
     messageFindAll(currentPage, countPerPage) {
-        return new ormModel().idFindAndCountAll('messPush', currentPage, countPerPage);
+        return new ormModel().findAndCountAll('messPush', currentPage, countPerPage);
     }
 
     /**
@@ -232,8 +232,8 @@ class editMysql {
      * @param 删除插件数据
      */
     
-    deletePlugAnList(name) {
-        return new ormModel().deletePlugAnList('plugAnList', name);
+    deletePlugAnList(id) {
+        return new ormModel().deletePlugAnList('plugAnList', id);
     }
 
     /**
@@ -363,7 +363,11 @@ class editMysql {
      */
 
     getFindAllData(str, currentPage, countPerPage, id) {
-        return new ormModel().findAndCountAll(str, currentPage, countPerPage, id);
+        if (id) {
+            return new ormModel().idFindAndCountAll(str, currentPage, countPerPage, id);
+        } else {
+            return new ormModel().findAndCountAll(str, currentPage, countPerPage);
+        }
     }
 
     /**
