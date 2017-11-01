@@ -105,6 +105,14 @@ class editMysql {
     }
 
     /**
+     * @param getErrorMessageCount
+     */
+
+    getErrorMessageCount(str) {
+        return new ormModel().getCount(str);
+    }
+
+    /**
      * @param errorMessage
      */
 
