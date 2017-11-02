@@ -7,7 +7,8 @@
  
 module.exports = function (sequelize, DataTypes) {
     const NetErrorMessage = sequelize.define('netErrorMessage', {
-        id: { type: DataTypes.INTEGER, autoIncrement:true, primaryKey : true, unique : true, comment: '主键' },
+        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, unique: true, comment: '主键' },
+        source: {type: DataTypes.STRING},
         method: { type: DataTypes.STRING},
         originalUrl: { type: DataTypes.STRING},
         status: { type: DataTypes.STRING},
