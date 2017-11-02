@@ -158,8 +158,8 @@ class ormModel {
      * @param 查看所有数据
      */
 
-    getCount(str) {
-        return sequelize.query("SELECT type, DATE_FORMAT(sTime, '%Y-%m-%d') AS sTime, count(*) AS count FROM `errorMessages` AS `errorMessage` where DATE_FORMAT(sTime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d') GROUP BY DATE_FORMAT(sTime, '%Y-%m-%d') ,type ORDER BY type, DATE_FORMAT(sTime, '%Y-%m-%d') asc").spread(function (results, metadata) {
+    query(sql) {
+        return sequelize.query(sql).spread(function (results, metadata) {
             return metadata;
         })
     }
@@ -186,7 +186,17 @@ class ormModel {
     plugPlugAnInfo(str, version, channl, systemVer) {
         return db[str].findAll({ where: { channl, version, systemVer } });
     }
-    
+
+	/**
+     *
+     * @param str
+     * @param where
+     * @returns {*|Promise.<Array.<Model>>}
+     */
+    findData(str, where) {
+        // return db[str].findAll({ where: where });
+        return db[str].getCount('select count(*) from messPushes where isEnable = TRUE');
+    }
 }
 
 module.exports = ormModel;
