@@ -9,6 +9,7 @@ module.exports = function (sequelize, DataTypes) {
     const MessPush = sequelize.define('messPush', {
         id: { type: DataTypes.INTEGER, autoIncrement:true, primaryKey : true, unique : true, comment: '主键' },
         channl: { type: DataTypes.STRING},
+        plant: { type:DataTypes.STRING},
         content: { type: DataTypes.STRING},
         isEnable: { type: DataTypes.BOOLEAN},
         time: { type: DataTypes.STRING},
