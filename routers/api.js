@@ -96,21 +96,39 @@ class ApiController {
     static async getTypeErr(ctx, next) {
         const d = await new editMysql().getErrorMessageCount('errorMessage');
         
-        let a = [], obj = {};
-        for (let i in d) {
-            let array = [];
-            for (let j = 6; j >=0; j--) {
-                let date = moment().subtract(j, 'days').format('YYYY-MM-DD')
+        let array, pieArray = [], obj = {}, b = {}, count = 0;
 
-                if (date == d[i].sTime) {
-                    array.push(d[i].count)
-                } else {
-                    array.push(0)
+        d.map((v, index) => {
+            array = [];
+            for (let j = 6; j >= 0; j--) {
+                let date = moment().subtract(j, 'days').format('YYYY-MM-DD'), count = 0;
+
+                if (date == v.sTime) {
+                    count = v.count;
+                } else if (obj[v.type] && obj[v.type][6 - j] !== 0) {
+                    count = obj[v.type][6 - j];
                 }
+                array.push(count);
+            }
+            obj[v.type] = array;
+        })
+
+        d.reduce((pre, cur, index, arr) => {
+            array = [];
+
+            if (pre.type === cur.type) {
+                cur.count = pre.count + cur.count;
+            } else {
+                pieArray.push({value: pre.count, name: pre.type});
             }
 
-            obj[d[i].type] = array;
-        }
+            if (index === arr.length - 1) {
+                pieArray.push({ value: cur.count, name: cur.type });
+            }
+            return cur;
+        })
+
+        obj['pieData'] = pieArray;
         ctx.body = {
             success: true,
             data: obj,
@@ -200,7 +218,7 @@ class ApiController {
 
             const dt = await new editMysql().getPlugAnListId(ctx.request.body.plugName);
 
-            if (dt.plugListName == ctx.request.body.plugName) {
+            if (dt && dt.plugListName == ctx.request.body.plugName) {
                 return ctx.body = {
                     msg: '插件不能重复命名，请检查插件命名，重新输入。。',
                     success: false

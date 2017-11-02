@@ -82,6 +82,7 @@ router
 router
     .post('/plugin/api/addMessage', oauth.user, addMes.addMessage)
     .get('/plugin/api/getMessage', oauth.user, addMes.getMessage)
+    .get('/plugin/api/getMessageByStatus', oauth.pass, addMes.getMessageByStatus)
     .post('/plugin/api/setMessage', oauth.user, addMes.setMessage);
 
 

@@ -48,6 +48,30 @@ class messagePush {
     }
 
     /**
+     * 获取信心用于前端分页显示
+     */
+
+    static async getMessageByStatus(ctx) {
+    
+        const { plant } = ctx.query;
+
+        let data = await new editMysql().getFindData(plant);
+        if (data) {
+            ctx.body = {
+                success: true,
+                code: 1,
+                msg: data[0].content,
+            };
+        } else {
+            ctx.body = {
+                success: true,
+                code: 0,
+                msg: '无数据'
+            };
+        }
+    }
+
+    /**
      * 设置推送消息
      */
     

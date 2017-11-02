@@ -108,8 +108,8 @@ class editMysql {
      * @param getErrorMessageCount
      */
 
-    getErrorMessageCount(str) {
-        return new ormModel().getCount(str);
+    getErrorMessageCount() {
+        return new ormModel().query("SELECT type, DATE_FORMAT(sTime, '%Y-%m-%d') AS sTime, count(*) AS count FROM `errorMessages` AS `errorMessage` where DATE_FORMAT(sTime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d') GROUP BY DATE_FORMAT(sTime, '%Y-%m-%d') ,type ORDER BY type, DATE_FORMAT(sTime, '%Y-%m-%d') asc");
     }
 
     /**
@@ -384,6 +384,16 @@ class editMysql {
 
     getPlugAnListInfoData(version, channl, systemVer) {
         return new ormModel().plugPlugAnInfo('plugAnListInfo', version, channl, systemVer);
+    }
+
+	/**
+     * 获取数据
+     * @param str
+     * @param where
+     * @returns {*|Promise.<Array.<Model>>}
+     */
+    getFindData(plant) {
+        return new ormModel().query('select content from messPushes where isEnable = TRUE and ' + plant + ' in (plant)');
     }
    
 }
