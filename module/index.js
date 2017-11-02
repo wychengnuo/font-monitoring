@@ -386,13 +386,13 @@ class editMysql {
         return new ormModel().plugPlugAnInfo('plugAnListInfo', version, channl, systemVer);
     }
 
+
 	/**
-     * 获取数据
-     * @param str
-     * @param where
-     * @returns {*|Promise.<Array.<Model>>}
+     * 根据状态和平台获取数据
+     * @param plant
+     * @returns {*}
      */
-    getFindData(plant) {
+    getMessageByStatus(plant) {
         return new ormModel().query('select content from messPushes where isEnable = TRUE and ' + plant + ' in (plant)');
     }
    

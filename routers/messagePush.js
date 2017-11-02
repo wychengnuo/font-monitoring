@@ -55,7 +55,7 @@ class messagePush {
     
         const { plant } = ctx.query;
 
-        let data = await new editMysql().getFindData(plant);
+        let data = await new editMysql().getMessageByStatus(plant);
         if (data) {
             ctx.body = {
                 success: true,
