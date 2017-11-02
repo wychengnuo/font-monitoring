@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
         sLine: { type: DataTypes.STRING},
         sColu: { type: DataTypes.STRING},
         eObj: { type: DataTypes.STRING},
-        sTime: { type: DataTypes.STRING},
+        sTime: { type: DataTypes.DATE},
         browerType: { type: DataTypes.STRING}
     },
         {
