@@ -96,9 +96,9 @@ class ApiController {
     static async getTypeErr(ctx, next) {
         const d = await new editMysql().getErrorMessageCount('errorMessage');
         
-        let array, pieArray = [], obj = {}, b = {}, count = 0;
+        let array, pieArray = [], obj = {};
 
-        d.map((v, index) => {
+        d.map((v) => {
             array = [];
             for (let j = 6; j >= 0; j--) {
                 let date = moment().subtract(j, 'days').format('YYYY-MM-DD'), count = 0;
@@ -114,8 +114,6 @@ class ApiController {
         })
 
         d.reduce((pre, cur, index, arr) => {
-            array = [];
-
             if (pre.type === cur.type) {
                 cur.count = pre.count + cur.count;
             } else {
@@ -140,16 +138,30 @@ class ApiController {
     // 对接口错误信息返回进行处理
 
     static async getUrlErr(ctx, next) {
-        const d = await new editMysql().getErrorMessageSet('netErrorMessage');
-        
-        let a = [];
-        for (let i in d) {
-            a.push(d[i].originalUrl);
-        }
-        const data = await type(a);
+        const d = await new editMysql().getErrorMessageSet();
+
+        let array, obj = {};
+        d.map(v => {
+            array = [];
+            if (!obj[v.source]) {
+                obj[v.source] = {};
+            }
+            if (!obj[v.source][v.method]) {
+                obj[v.source][v.method] = [];
+            }
+
+            array.push(new Date(v.time).getTime());
+            array.push(v.t.replace('ms', ''));
+            array.push(v.status);
+            array.push(v.method);
+            array.push(v.originalUrl);
+
+            obj[v.source][v.method].push(array);
+        })
+
         ctx.body = {
             success: true,
-            data: data,
+            data: obj,
             msg: '成功'
         };
         await next();
@@ -372,7 +384,7 @@ class ApiController {
 
     static async settingPlug(ctx, next) {
      
-        const { num, pathName, name, version } = ctx.request.body;
+        const { num, pathName, id, version } = ctx.request.body;
 
         let isEnable = {};
 
@@ -397,7 +409,7 @@ class ApiController {
 
         if (num == '1' || num == '2') {
 
-            new editMysql().updatePlugAnListId(name, isEnable);
+            new editMysql().updatePlugAnListId(id, isEnable);
 
             ctx.body = {
                 success: true,
@@ -508,22 +520,45 @@ class ApiController {
      */
 
     static async getPlugDownloads(ctx, next) {
-        const data = await new editMysql().getErrorMessageSet('plugDown');
+        const data = await new editMysql().getPlugDownLoads();
 
-        let arr = [];
-        let obj = {};
+        let arr, obj = {}, pieArray = [];
 
-        for (let i in data) {
-            obj = {};
-            obj.name = data[i].name;
-            obj.sum = data[i].sum;
-            arr.push(obj);
-        }
-  
+        data.map(v => {
+            arr = [];
+            for (let j = 6; j >= 0; j--) {
+                let date = moment().subtract(j, 'days').format('YYYY-MM-DD'), count = 0;
+
+                if (date == v.time) {
+                    count = v.sum;
+                } else if (obj[v.name] && obj[v.name][6 - j] !== 0) {
+                    count = obj[v.name][6 - j];
+                }
+                arr.push(count);
+            }
+            obj[v.name] = arr;
+        })
+
+        data.reduce((pre, cur, index, arr) => {
+
+            if (pre.name === cur.name) {
+                cur.sum = pre.sum + cur.sum;
+            } else {
+                pieArray.push({value: pre.sum, name: pre.name});
+            }
+
+            if (index === arr.length - 1) {
+                pieArray.push({ value: cur.sum, name: cur.name });
+            }
+            return cur;
+        })
+
+        obj['pieData'] = pieArray;
+
         if (data) {
             ctx.body = {
                 success: true,
-                data: arr,
+                data: obj,
                 msg: '成功'
             };
         } else {
