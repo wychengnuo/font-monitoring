@@ -78,8 +78,8 @@ class ormModel {
      * @param 更新插件版本详细信息状态
      */
 
-    setPlugupdate(str, plugName, isEnable) { 
-        db[str].update({ isEnable: isEnable }, { where: { plugName: { '$like': '%' + plugName } } });
+    setPlugupdate(str, id, isEnable) {
+        db[str].update({ isEnable: isEnable }, { where: { id: id } });
     }
 
     /**
