@@ -28,6 +28,7 @@ function loggers(ctx, start, err) {
     const t = time(start);
     const status = err ? (err.status || 500) : (ctx.status || 404);
     const o = {};
+    o.source = ctx.source;
     o.method = ctx.method;
     o.originalUrl = ctx.originalUrl;
     o.status = status;

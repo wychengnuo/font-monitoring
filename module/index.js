@@ -100,8 +100,8 @@ class editMysql {
      * @param getErrorMessageSet
      */
 
-    getErrorMessageSet(str) {
-        return new ormModel().findAll(str);
+    getErrorMessageSet() {
+        return new ormModel().query("select source, method, originalUrl, status, t, time from netErrorMessages where DATE_FORMAT(time, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
     }
 
     /**
@@ -109,7 +109,7 @@ class editMysql {
      */
 
     getErrorMessageCount() {
-        return new ormModel().query("SELECT type, DATE_FORMAT(sTime, '%Y-%m-%d') AS sTime, count(*) AS count FROM `errorMessages` AS `errorMessage` where DATE_FORMAT(sTime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d') GROUP BY DATE_FORMAT(sTime, '%Y-%m-%d') ,type ORDER BY type, DATE_FORMAT(sTime, '%Y-%m-%d') asc");
+        return new ormModel().query("SELECT type, DATE_FORMAT(sTime, '%Y-%m-%d') AS sTime, count(*) AS count FROM `errorMessages` AS `errorMessage` where DATE_FORMAT(sTime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d') GROUP BY DATE_FORMAT(sTime, '%Y-%m-%d') ,type ORDER BY type, DATE_FORMAT(sTime, '%Y-%m-%d') asc");
     }
 
     /**
@@ -147,6 +147,7 @@ class editMysql {
 
     netMessageSet(data) {
         new ormModel({
+            'source': data.source,
             'method': data.method,
             'originalUrl': data.originalUrl,
             'status': data.status,
@@ -272,8 +273,8 @@ class editMysql {
      * @param 设置插件版本插件的状态
      */
 
-    updatePlugAnListId(plugName, isEnable) {
-        new ormModel().setPlugupdate('plugAnListInfo', plugName, isEnable.isEnable);
+    updatePlugAnListId(id, isEnable) {
+        new ormModel().setPlugupdate('plugAnListInfo', id, isEnable.isEnable);
     }
 
     /**
@@ -364,6 +365,14 @@ class editMysql {
 
     updatePlugDownId(data) {
         new ormModel().update('plugDown', data.sum + 1, data.name);
+    }
+
+	/**
+     * 获取一周内下载量
+     * @returns {*}
+     */
+    getPlugDownLoads() {
+        return new ormModel().query("select name, DATE_FORMAT(utime, '%Y-%m-%d') as time, sum from plugDowns where DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
     }
 
     /**
