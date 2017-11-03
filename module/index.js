@@ -100,8 +100,8 @@ class editMysql {
      * @param getErrorMessageSet
      */
 
-    getErrorMessageSet(str) {
-        return new ormModel().findAll(str);
+    getErrorMessageSet() {
+        return new ormModel().query("select source, method, originalUrl, status, t, time from netErrorMessages where DATE_FORMAT(time, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d')");
     }
 
     /**

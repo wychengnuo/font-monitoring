@@ -98,7 +98,7 @@ class ApiController {
         
         let array, pieArray = [], obj = {}, b = {}, count = 0;
 
-        d.map((v, index) => {
+        d.map((v) => {
             array = [];
             for (let j = 6; j >= 0; j--) {
                 let date = moment().subtract(j, 'days').format('YYYY-MM-DD'), count = 0;
@@ -140,16 +140,30 @@ class ApiController {
     // 对接口错误信息返回进行处理
 
     static async getUrlErr(ctx, next) {
-        const d = await new editMysql().getErrorMessageSet('netErrorMessage');
-        
-        let a = [];
-        for (let i in d) {
-            a.push(d[i].originalUrl);
-        }
-        const data = await type(a);
+        const d = await new editMysql().getErrorMessageSet();
+
+        let array, obj = {};
+        d.map(v => {
+            array = [];
+            if (!obj[v.source]) {
+                obj[v.source] = {};
+            }
+            if (!obj[v.source][v.method]) {
+                obj[v.source][v.method] = [];
+            }
+
+            array.push(new Date(v.time).getTime());
+            array.push(v.t.replace('ms', ''));
+            array.push(v.status);
+            array.push(v.method);
+            array.push(v.originalUrl);
+
+            obj[v.source][v.method].push(array);
+        })
+
         ctx.body = {
             success: true,
-            data: data,
+            data: obj,
             msg: '成功'
         };
         await next();
