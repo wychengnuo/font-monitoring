@@ -419,24 +419,27 @@ class ApiController {
              * 删除数据库字段
              */
 
-            const homeDir = path.resolve(__dirname, '..');
-            const newpath = homeDir + '/public/download/' + pathName + '/' + version + '/' + name;
-            fs.unlink(newpath);
+            const data = await new editMysql().getData('plugAnListInfo', { id: id })
+            if (data && data.length > 0) {
+                const homeDir = path.resolve(__dirname, '..');
+                const newpath = homeDir + '/public/download/' + pathName + '/' + version + '/' + data[0].plugName;
+                if (fs.existsSync(newpath)) {
+                    fs.unlink(newpath);
+                }
 
-            const data = await new editMysql().getPlugAnListId(pathName);
+                let dt = await new editMysql().getPlugAnListInfoAll(id);
 
-            let dt = await new editMysql().getPlugAnListInfoAll(data.id);
-            
-            dt = dt.filter(v => v.plugName == name);
+                if (dt && dt.length > 0) {
+                    new editMysql().deletePlugDownId(dt[0].id);
+                }
 
-            new editMysql().deletePlugDownId(dt[0].id);
+                new editMysql().deletePlugAnListId(id);
 
-            new editMysql().deletePlugAnListId(dt[0].id);
-            
-            ctx.body = {
-                success: true,
-                msg: '删除成功'
-            };
+                ctx.body = {
+                    success: true,
+                    msg: '删除成功'
+                };
+            }
         }
 
         await next();
