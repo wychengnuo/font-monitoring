@@ -197,6 +197,16 @@ class ormModel {
         // return db[str].findAll({ where: where });
         return db[str].getCount('select count(*) from messPushes where isEnable = TRUE');
     }
+
+	/**
+     * 根据where条件查询数据
+     * @param str
+     * @param where
+     * @returns {*|Promise.<Array.<Model>>}
+     */
+    getData(str, where) {
+        return db[str].findAll({ where: where });
+    }
 }
 
 module.exports = ormModel;
