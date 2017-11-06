@@ -404,6 +404,16 @@ class editMysql {
     getMessageByStatus(plant) {
         return new ormModel().query('select content from messPushes where isEnable = TRUE and ' + plant + ' in (plant)');
     }
+
+	/**
+     * 根据where条件查询数据
+     * @param str
+     * @param where
+     * @returns {*}
+     */
+    getData(str, where) {
+        return new ormModel().getData(str, where);
+    }
    
 }
 
