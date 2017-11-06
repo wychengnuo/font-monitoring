@@ -19,8 +19,6 @@ class ApiController {
     // 存储用户版本信息
     static async setBasic(ctx, next) {
 
-        require('./../utils/browserType')(ctx.headers['user-agent']);
-
         let data = await new editMysql().getBrowerSet(ctx.request.body.account);
 
         data = !data ? {} : data;
