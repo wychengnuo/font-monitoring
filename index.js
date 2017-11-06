@@ -252,10 +252,11 @@
      * @param request 
      */
 
-    var request = new XMLHttpRequest();
+    
 
     var Ajax = {
         get: function (url, fn) {
+            var request = new XMLHttpRequest();
             request.open('GET', url, true);
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200 || request.status == 304) { // readyState==4说明请求已完成                    
@@ -267,6 +268,7 @@
             request.send(null);
         },
         post: function (url, data, fn) {
+            var request = new XMLHttpRequest();
             request.open('post', url, true);
             request.setRequestHeader('Content-type', 'application/json'); // 发送信息至服务器时内容编码类型
             request.onreadystatechange = function () {
