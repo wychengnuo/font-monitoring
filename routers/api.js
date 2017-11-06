@@ -422,7 +422,6 @@ class ApiController {
              */
 
             const data = await new editMysql().getData('plugAnListInfo', { id: id })
-            console.log('======'+JSON.stringify(data))
             if (data && data.length > 0) {
                 const homeDir = path.resolve(__dirname, '..');
                 const newpath = homeDir + '/public/download/' + pathName + '/' + version + '/' + data[0].plugName;
