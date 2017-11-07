@@ -19,8 +19,6 @@ class ApiController {
     // 存储用户版本信息
     static async setBasic(ctx, next) {
 
-        require('./../utils/browserType')(ctx.headers['user-agent']);
-
         let data = await new editMysql().getBrowerSet(ctx.request.body.account);
 
         data = !data ? {} : data;
@@ -97,7 +95,6 @@ class ApiController {
         const d = await new editMysql().getErrorMessageCount('errorMessage');
         
         let array, pieArray = [], obj = {};
-
         d.map((v) => {
             array = [];
             for (let j = 6; j >= 0; j--) {
@@ -113,25 +110,34 @@ class ApiController {
             obj[v.type] = array;
         })
 
-        d.reduce((pre, cur, index, arr) => {
-            if (pre.type === cur.type) {
-                cur.count = pre.count + cur.count;
-            } else {
-                pieArray.push({value: pre.count, name: pre.type});
-            }
+        if (d && d.length > 0) {
+            d.reduce((pre, cur, index, arr) => {
+                if (pre.type === cur.type) {
+                    cur.count = pre.count + cur.count;
+                } else {
+                    pieArray.push({value: pre.count, name: pre.type});
+                }
 
-            if (index === arr.length - 1) {
-                pieArray.push({ value: cur.count, name: cur.type });
-            }
-            return cur;
-        })
+                if (index === arr.length - 1) {
+                    pieArray.push({ value: cur.count, name: cur.type });
+                }
+                return cur;
+            })
 
-        obj['pieData'] = pieArray;
-        ctx.body = {
-            success: true,
-            data: obj,
-            msg: '成功'
-        };
+            obj['pieData'] = pieArray;
+            ctx.body = {
+                success: true,
+                data: obj,
+                msg: '成功'
+            };
+        } else {
+            ctx.body = {
+                success: false,
+                data: {},
+                msg: '失败'
+            };
+        }
+
         await next();
     }
 
@@ -519,7 +525,7 @@ class ApiController {
     }
 
     /**
-     * 获取下载量
+     * 获取下载量（一周）
      */
 
     static async getPlugDownloads(ctx, next) {
@@ -542,23 +548,23 @@ class ApiController {
             obj[v.name] = arr;
         })
 
-        data.reduce((pre, cur, index, arr) => {
+        if (data && data.length > 0) {
+            data.reduce((pre, cur, index, arr) => {
 
-            if (pre.name === cur.name) {
-                cur.sum = pre.sum + cur.sum;
-            } else {
-                pieArray.push({value: pre.sum, name: pre.name});
-            }
+                if (pre.name === cur.name) {
+                    cur.sum = pre.sum + cur.sum;
+                } else {
+                    pieArray.push({value: pre.sum, name: pre.name});
+                }
 
-            if (index === arr.length - 1) {
-                pieArray.push({ value: cur.sum, name: cur.name });
-            }
-            return cur;
-        })
+                if (index === arr.length - 1) {
+                    pieArray.push({ value: cur.sum, name: cur.name });
+                }
+                return cur;
+            })
 
-        obj['pieData'] = pieArray;
+            obj['pieData'] = pieArray;
 
-        if (data) {
             ctx.body = {
                 success: true,
                 data: obj,
@@ -571,6 +577,17 @@ class ApiController {
                 msg: '失败'
             };
         }
+
+        await next();
+    }
+
+    /**
+     * 获取下载量（全部）
+     */
+
+    static async getPlugDownList(ctx, next) {
+        await paging(ctx, 'plugDown');
+
         await next();
     }
 

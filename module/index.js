@@ -249,8 +249,8 @@ class editMysql {
      * @param andir 插件列表id
      */
 
-    getPlugAnListInfoId(name) {
-        return new ormModel().select('plugAnListInfo', name);
+    getPlugAnListInfoId(where) {
+        return new ormModel().getDataForOne('plugAnListInfo', where);
     }
 
     /**
@@ -343,8 +343,8 @@ class editMysql {
      * @param 下载量累加
      */
 
-    getPlugDownId(name) {
-        return new ormModel().select('plugDown', name);
+    getPlugDownId(where) {
+        return new ormModel().getDataForOne('plugDown', where);
     }
 
     /**
@@ -353,8 +353,14 @@ class editMysql {
 
     plugDown(data, id) {
         new ormModel({
-            name: data,
+            name: data.channel,
             sum: 1,
+            mobileModel: data.mobileModel,
+            mobileVersion: data.mobileVersion,
+            networkType: data.networkType,
+            romInfo: data.romInfo,
+            appVersion: data.appVersion,
+            imei: data.imei,
             plugAnListInfoId: id
         }).creat('plugDown');
     }
