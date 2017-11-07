@@ -207,6 +207,16 @@ class ormModel {
     getData(str, where) {
         return db[str].findAll({ where: where });
     }
+
+	/**
+     * 根据where条件查询数据
+     * @param str
+     * @param where
+     * @returns {Promise.<Model>}
+     */
+    getDataForOne(str, where) {
+        return db[str].findOne({ where: where });
+    }
 }
 
 module.exports = ormModel;

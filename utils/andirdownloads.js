@@ -7,30 +7,31 @@
 
 const editMysql = require('./../module/index');
 
-module.exports = async (ctx, channl, homeDir,  next) => {
+module.exports = async (ctx, obj, homeDir,  next) => {
 
     /**
      * 检查redis是否存在channl
      */
-
-    if (channl) {
+    if (obj && obj.channel) {
         let name = homeDir.split('/')[homeDir.split('/').length - 3];
+        let version = homeDir.split('/')[homeDir.split('/').length - 2];
 
         // name = homeDir, sum += 1;
 
-        let a = await new editMysql().getPlugAnListInfoId(name);
+        let a = await new editMysql().getPlugAnListInfoId({ name: name, plugVersion: version });
 
         a = !a ? {} : a;
 
-        let b = await new editMysql().getPlugDownId(channl);
-
-        b = !b ? {} : b;
-
         if (a.id) {
-            if (b.name == channl) { 
+
+            let b = await new editMysql().getPlugDownId({ name: obj.channel, plugAnListInfoId: a.id });
+
+            b = !b ? {} : b;
+
+            if (b.name) {
                 new editMysql().updatePlugDownId(b);
             } else {
-                new editMysql().plugDown(channl, a.id);
+                new editMysql().plugDown(obj, a.id);
             }
         }
         // await next();

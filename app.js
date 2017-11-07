@@ -67,8 +67,16 @@ app.use(async (ctx, next) => {
         try {
             const homeDir = decodeURIComponent(ctx.path);
             let filePath = path.join(__dirname, homeDir);
-            const channl = ctx.headers['channel'];
-            require('./utils/andirdownloads')(ctx, channl, homeDir, next);
+            let obj = {
+                channel : ctx.headers['channel'],
+                mobileModel : ctx.headers['mobile_model'] || '',
+                mobileVersion : ctx.headers['os_version'] || '',
+                networkType : ctx.headers['network_type'] || '',
+                romInfo : ctx.headers['rom_info'] || '',
+                appVersion : ctx.headers['sver'] || '',
+                imei : ctx.headers['imei'] || ''
+            }
+            require('./utils/andirdownloads')(ctx, obj, homeDir, next);
             ctx.response.attachment(filePath);
 
         } catch (error) {
