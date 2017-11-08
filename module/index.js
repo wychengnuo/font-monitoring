@@ -351,7 +351,7 @@ class editMysql {
      * @param 插件下载量统计
      */
 
-    plugDown(data, id) {
+    async plugDown(data, id) {
         new ormModel({
             name: data.channel,
             sum: 1,
@@ -369,8 +369,8 @@ class editMysql {
      * @param 更新下载量id
      */
 
-    updatePlugDownId(data) {
-        new ormModel().update('plugDown', data.sum + 1, data.name);
+    updatePlugDownId(data, a) {
+        return new ormModel().update('plugDown', data.sum + a, data.name);
     }
 
 	/**

@@ -7,32 +7,61 @@
 
 const editMysql = require('./../module/index');
 
-module.exports = async (ctx, obj, homeDir,  next) => {
+const throttle = require('lodash.throttle');
 
-    /**
-     * 检查redis是否存在channl
-     */
+const updateDate = throttle((b, id) => {
+    new editMysql().updatePlugDownId(b, id).then((data) => {
+        global.a[b.id] = 0;
+        global.d = 0;
+        global.f = 0;
+        global.e = {};
+        global.b = {};
+    })
+}, 1500);
+
+module.exports = async (ctx, obj, homeDir, next) => {
+    
+
     if (obj && obj.channel) {
         let name = homeDir.split('/')[homeDir.split('/').length - 3];
         let version = homeDir.split('/')[homeDir.split('/').length - 2];
 
-        // name = homeDir, sum += 1;
+        if (!global.b[obj.channel]) {
+            let adata = await new editMysql().getPlugAnListInfoId({ name: name, plugVersion: version });
+            adata = !adata ? {} : adata;
+            global.b[obj.channel] = adata;
+        }
 
-        let a = await new editMysql().getPlugAnListInfoId({ name: name, plugVersion: version });
+        if (global.b[obj.channel].id) {
 
-        a = !a ? {} : a;
-
-        if (a.id) {
-
-            let b = await new editMysql().getPlugDownId({ name: obj.channel, plugAnListInfoId: a.id });
-
-            b = !b ? {} : b;
-
-            if (b.name) {
-                new editMysql().updatePlugDownId(b);
-            } else {
-                new editMysql().plugDown(obj, a.id);
+            if (!global.e[obj.channel]) {
+                
+                let bdata = await new editMysql().getPlugDownId({ name: obj.channel, plugAnListInfoId: global.b[obj.channel].id });
+                
+                bdata = !bdata ? {} : bdata;
+    
+                global.e[bdata.name] = bdata;
+                
             }
+            
+            if (typeof global.e[obj.channel] !== 'undefined' && global.e[obj.channel].plugAnListInfoId === global.b[obj.channel].id) {
+                
+                global.a[b.id] = (global.a[b.id] || 0) + 1;
+
+                global.f++;
+
+                if (global.d >= 100) {
+                    updateDate(global.e[obj.channel], global.a[b.id]);
+                }
+
+            } else {
+
+                if (global.e[obj.channel] !== obj.channel) {
+                    new editMysql().plugDown(obj, global.b[obj.channel].id);
+                }
+                // next();
+
+            }   
         }
         // await next();
     }

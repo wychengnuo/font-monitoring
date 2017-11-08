@@ -20,10 +20,10 @@ class ApiController {
     static async setBasic(ctx, next) {
 
         let data = await new editMysql().getBrowerSet(ctx.request.body.account);
-
-        data = !data ? {} : data;
- 
-        if (ctx.request.body.account != data.account) {
+        
+        let d = !data ? {} : data;
+        
+        if (ctx.request.body.account != d.account) {
 
             new editMysql().browerSet(ctx.request.body);
             
@@ -37,6 +37,7 @@ class ApiController {
             msg: '失败',
             success: false
         };
+
         await next();
     }
 
@@ -554,11 +555,11 @@ class ApiController {
                 if (pre.name === cur.name) {
                     cur.sum = pre.sum + cur.sum;
                 } else {
-                    pieArray.push({value: pre.sum, name: pre.name});
+                    pieArray.push({value: global.d < 100 ? (global.f === 0 ? pre.sum : global.f) : pre.sum + global.a[pre.id], name: pre.name});
                 }
 
                 if (index === arr.length - 1) {
-                    pieArray.push({ value: cur.sum, name: cur.name });
+                    pieArray.push({ value: global.d < 100 ? (global.f === 0 ? cur.sum : global.f) : cur.sum + global.a[pre.id], name: cur.name });
                 }
                 return cur;
             })
