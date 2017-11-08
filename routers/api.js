@@ -19,26 +19,24 @@ class ApiController {
     // 存储用户版本信息
     static async setBasic(ctx, next) {
 
-        new editMysql().getBrowerSet(ctx.request.body.account).then(data => {
+        let data = await new editMysql().getBrowerSet(ctx.request.body.account);
+        
+        let d = !data ? {} : data;
+        
+        if (ctx.request.body.account != d.account) {
 
-            let d = !data ? {} : data;
-            
-            if (ctx.request.body.account != d.account) {
-    
-                new editMysql().browerSet(ctx.request.body);
-                
-                ctx.body = {
-                    msg: '成功',
-                    success: true
-                };  
-            }
+            new editMysql().browerSet(ctx.request.body);
             
             ctx.body = {
-                msg: '失败',
-                success: false
-            };
-
-        })
+                msg: '成功',
+                success: true
+            };  
+        }
+        
+        ctx.body = {
+            msg: '失败',
+            success: false
+        };
 
         await next();
     }
