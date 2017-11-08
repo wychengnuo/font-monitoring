@@ -17,7 +17,7 @@ const updateDate = throttle((b, id) => {
         global.e = {};
         global.b = {};
     })
-}, 1400);
+}, 1500);
 
 module.exports = async (ctx, obj, homeDir, next) => {
     
@@ -50,7 +50,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
 
                 global.f++;
 
-                if (global.d == 100) {
+                if (global.d >= 100) {
                     updateDate(global.e[obj.channel], global.a[b.id]);
                 }
 
@@ -59,7 +59,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
                 if (global.e[obj.channel] !== obj.channel) {
                     new editMysql().plugDown(obj, global.b[obj.channel].id);
                 }
-                next();
+                // next();
 
             }   
         }

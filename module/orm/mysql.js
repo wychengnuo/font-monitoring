@@ -16,9 +16,9 @@ const sequelize = new Sequelize(config.database, config.user, config.password, {
     host: config.host,
     dialect: 'mysql',
     pool: {
-        max: 5,
+        max: 10,
         min: 0,
-        idle: 1000,
+        idle: 10000,
         evict: 0
     },
     timezone: '+08:00'
