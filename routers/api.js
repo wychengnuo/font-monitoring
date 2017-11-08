@@ -581,12 +581,62 @@ class ApiController {
         await next();
     }
 
+
+    static async getPlugSearch(ctx, next) {
+        // let name = ctx.request.name;
+        // let channel = ctx.request.channel;
+        // let appVersion = ctx.request.appVersion;
+
+        let channelList = await new editMysql().getPlugChannelList();
+        let nameList = await new editMysql().getPlugNamelList();
+        let versionList = await new editMysql().getPlugVersionlList();
+
+        let data = {
+            channelList: channelList || [],
+            nameList: nameList || [],
+            versionList: versionList || []
+        }
+
+        ctx.body = {
+            success: true,
+            data: data,
+            msg: '成功'
+        };
+
+        next();
+    }
+
     /**
      * 获取下载量（全部）
      */
 
     static async getPlugDownList(ctx, next) {
-        await paging(ctx, 'plugDown');
+
+        let currentPage = ctx.query.page ? ctx.query.page : 1;
+        let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
+        let plugChannel = ctx.query.channel || '';
+        let plugName = ctx.query.name || '';
+        let plugVersion = ctx.query.version || '';
+
+        let data = await new editMysql().getPlugDownList(Number(currentPage), Number(countPerPage), plugChannel,
+            plugName, plugVersion);
+        let obj = await new editMysql().getPlugDownList(Number(currentPage), Number(countPerPage), plugChannel,
+            plugName, plugVersion, true);
+
+        if (obj.length > 0 && obj[0].count > 0) {
+            ctx.body = {
+                success: true,
+                data: {list: data, totalCount: Math.ceil(obj[0].count / Number(countPerPage))},
+                msg: '成功',
+                pageSize: Math.ceil(data.length / Number(countPerPage))
+            };
+        } else {
+            ctx.body = {
+                success: false,
+                data: {list: [], totalCount:0},
+                msg: '失败'
+            };
+        }
 
         await next();
     }

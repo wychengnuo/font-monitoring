@@ -35,6 +35,9 @@
                     packJSON.account = _maq[i][1];
                     packJSON.source = _maq[i][2];
                     break;
+                case '_getMessage':
+                    packJSON.getMessageUrl = '/plugin/api/getMessageByStatus?plant=' + _maq[i][2];
+                    break;
                 default:
                     break;
             }
@@ -351,6 +354,16 @@
                 ls.remove(localData);
             }
         });
+    }
+
+    // 消息推送
+    if (packJSON.getMessageUrl) {
+        Ajax.get(packJSON.getMessageUrl, function (data) {
+            var data = JSON.parse(data);
+            if (data.success && data.code === 1) {
+                alert(data.msg)
+            }
+        })
     }
     // } else {
     //     alert('网络不好！');
