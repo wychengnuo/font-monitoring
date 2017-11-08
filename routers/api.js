@@ -557,11 +557,11 @@ class ApiController {
                 if (pre.name === cur.name) {
                     cur.sum = pre.sum + cur.sum;
                 } else {
-                    pieArray.push({value: pre.sum + global.a[pre.id], name: pre.name});
+                    pieArray.push({value: global.d < 100 ? global.f : pre.sum + global.a[pre.id], name: pre.name});
                 }
 
                 if (index === arr.length - 1) {
-                    pieArray.push({ value: cur.sum + global.a[pre.id], name: cur.name });
+                    pieArray.push({ value: global.d < 100 ? global.f : cur.sum + global.a[pre.id], name: cur.name });
                 }
                 return cur;
             })

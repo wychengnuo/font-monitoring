@@ -45,6 +45,10 @@ if (!fs.existsSync(baseUrl)) {
 
 global.a = {};
 global.b = {};
+global.c = {};
+global.d = 0;
+global.e = {};
+global.f = 0;
 
 app.use(async (ctx, next) => {
 
@@ -53,6 +57,12 @@ app.use(async (ctx, next) => {
      */
    
     if (ctx.originalUrl.indexOf('/public/download') == 0) {
+
+        if (!global.c[ctx.headers['channel']]) {
+            global.d = 0;
+        }
+
+        global.c[ctx.headers['channel']] = global.d+=1;
 
         try {
             const homeDir = decodeURIComponent(ctx.path);
