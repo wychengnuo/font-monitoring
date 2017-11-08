@@ -34,7 +34,7 @@ function loggers(ctx, start, err) {
     o.status = status;
     o.t = t;
     o.time = moment().format('YYYY-MM-DD HH:mm:ss');
-    if ((ctx.originalUrl.indexOf('/plugin/api') === 0) {
+    if (ctx.originalUrl.indexOf('/plugin/api') === 0) {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
         new editMysql().netMessageSet(o);
     }
