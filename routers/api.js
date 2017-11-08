@@ -19,24 +19,27 @@ class ApiController {
     // 存储用户版本信息
     static async setBasic(ctx, next) {
 
-        let data = await new editMysql().getBrowerSet(ctx.request.body.account);
+        new editMysql().getBrowerSet(ctx.request.body.account).then(data => {
 
-        data = !data ? {} : data;
- 
-        if (ctx.request.body.account != data.account) {
-
-            new editMysql().browerSet(ctx.request.body);
+            let d = !data ? {} : data;
+            
+            if (ctx.request.body.account != d.account) {
+    
+                new editMysql().browerSet(ctx.request.body);
+                
+                ctx.body = {
+                    msg: '成功',
+                    success: true
+                };  
+            }
             
             ctx.body = {
-                msg: '成功',
-                success: true
-            };  
-        }
-        
-        ctx.body = {
-            msg: '失败',
-            success: false
-        };
+                msg: '失败',
+                success: false
+            };
+
+        })
+
         await next();
     }
 
@@ -554,11 +557,11 @@ class ApiController {
                 if (pre.name === cur.name) {
                     cur.sum = pre.sum + cur.sum;
                 } else {
-                    pieArray.push({value: pre.sum, name: pre.name});
+                    pieArray.push({value: global.d < 100 ? global.f : pre.sum + global.a[pre.id], name: pre.name});
                 }
 
                 if (index === arr.length - 1) {
-                    pieArray.push({ value: cur.sum, name: cur.name });
+                    pieArray.push({ value: global.d < 100 ? global.f : cur.sum + global.a[pre.id], name: cur.name });
                 }
                 return cur;
             })

@@ -1,7 +1,7 @@
 const development = {
     host        : 'localhost',
     user        : 'root',
-    password    : 'root',
+    password    : 'zhang@1993',
     database    : 'db_monitoring'
 };
 
