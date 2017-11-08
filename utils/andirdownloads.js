@@ -9,8 +9,8 @@ const editMysql = require('./../module/index');
 
 const throttle = require('lodash.throttle');
 
-const updateDate = throttle((b) => {
-    new editMysql().updatePlugDownId(b, global.a[b.id]).then((data) => {
+const updateDate = throttle((b, id) => {
+    new editMysql().updatePlugDownId(b, id).then((data) => {
         global.a[b.id] = 0;
         global.d = 0;
         global.f = 0;
@@ -48,8 +48,8 @@ module.exports = async (ctx, obj, homeDir, next) => {
 
                 global.f++;
 
-                if (global.d > 100) {
-                    updateDate(global.e[obj.channel]);
+                if (global.d > 3) {
+                    updateDate(global.e[obj.channel], global.a[b.id]);
                 }
 
             } else {
