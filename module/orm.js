@@ -103,7 +103,7 @@ class ormModel {
      */
 
     update(str, sum, name) { 
-        db[str].update({ sum: sum }, { where: { name } });
+        return db[str].update({ sum: sum }, { where: { name } });
     }
     
     /**

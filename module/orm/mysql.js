@@ -18,7 +18,8 @@ const sequelize = new Sequelize(config.database, config.user, config.password, {
     pool: {
         max: 5,
         min: 0,
-        idle: 10000
+        idle: 1000,
+        evict: 0
     },
     timezone: '+08:00'
 });

@@ -4,9 +4,9 @@ const app = new Koa();
 const path = require('path');
 const cors = require('koa-cors');
 const koaBody = require('koa-body');
+// const eventproxy = require('eventproxy');
 
 const getInterface = require('./utils/logs');
-// const existenceTime = require('./server/existenceTime');
 const { corn } = require('./config/default');
 
 app.use(cors());
@@ -24,21 +24,8 @@ const apiRouter = require('./routers/router');
 app.use(apiRouter.routes())
     .use(apiRouter.allowedMethods());
 
-// const redis = require('./server/redis');
-
 app
     .use(getInterface());
-    // .use(existenceTime(redis));
-/**
- *  redis 监控启动
- */
-
-// redis.on('error', function (err) {
-//     console.log('\n哈喽：\n亲爱的小伙。\n请启动redis！！！\n');
-//     redis.disconnect();
-//     console.log(err);
-//     throw err;
-// });
 
 const fs = require('fs');
 
@@ -56,12 +43,15 @@ if (!fs.existsSync(baseUrl)) {
  * 下载文件
  */
 
+global.a = {};
+global.b = {};
+
 app.use(async (ctx, next) => {
 
     /**
      * 兼容api不走下载
      */
-
+   
     if (ctx.originalUrl.indexOf('/public/download') == 0) {
 
         try {
@@ -76,7 +66,9 @@ app.use(async (ctx, next) => {
                 appVersion : ctx.headers['sver'] || '',
                 imei : ctx.headers['imei'] || ''
             }
+
             require('./utils/andirdownloads')(ctx, obj, homeDir, next);
+            
             ctx.response.attachment(filePath);
 
         } catch (error) {
