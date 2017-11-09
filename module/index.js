@@ -16,19 +16,51 @@ class editMysql {
     }
 
     /**
+     * @param 部门分类
+     */
+
+    roleSet(department) {
+        return new ormModel({ 'roleName': department }).creat('role');
+    }
+
+    /**
+     * @param 权限分类
+     */
+
+    projectsSet(id) {
+        new ormModel({ 'permissionsId': '1','roleId': id }).creat('projects');
+    }
+
+    /**
+     * @param 查看权限分类
+     */
+
+    selectProjects(id) {
+        return new ormModel().select('projects', { where: { roleId: id } });
+    }
+
+    /**
      * @param 登录方法操作
      */
 
-    userSet(name, nickname, password) {
-        return new ormModel({ 'username': name, 'nickname': nickname, 'password': password }).returnCreat('user');
+    userSet(name, nickname, password, roleId) {
+        return new ormModel({ 'username': name, 'nickname': nickname, 'password': password, 'roleId': roleId }).creat('user');
     }
 
     /**
      * @param 登录态方法操作
      */
 
-    tokenSet(token, id) {
-        new ormModel({ 'id': token, 'userId': id }).creat('token');
+    tokenSet(token, userId, roleId) {
+        new ormModel({ 'id': token, 'userId': userId, 'roleId': roleId }).creat('token');
+    }
+
+    /**
+     * @param 查看部门是否存在
+     */
+
+    selectRole(name) {
+        return new ormModel().select('role', { where: { roleName: name } });
     }
 
     /**
@@ -36,7 +68,7 @@ class editMysql {
      */
 
     selectUser(name) {
-        return new ormModel().selectUser('user', name);
+        return new ormModel().select('user', { where: { username: name } });
     }
 
     /**
@@ -44,7 +76,7 @@ class editMysql {
      */
 
     selectToken(token) {
-        return new ormModel().selectUserInfo('token', token);
+        return new ormModel().select('token', { where: { id: token } });
     }
 
     /**
@@ -52,7 +84,7 @@ class editMysql {
      */
     
     selectTokenIdUser(id) {
-        return new ormModel().selectUserInfo('user', id);
+        return new ormModel().select('user', { where: { id: id } });
     }
     
     /**
@@ -60,7 +92,7 @@ class editMysql {
      */
 
     userLayout(token) {
-        new ormModel().delete('token', token);
+        new ormModel().delete('token', { where: { id: token } });
     }
 
     /**
@@ -68,7 +100,7 @@ class editMysql {
      */
 
     getBrowerSet(account) {
-        return new ormModel().selectAccount('browser', account);
+        return new ormModel().select('browser', { where: { account: account } });
     }
 
     /**
@@ -77,22 +109,23 @@ class editMysql {
 
     browerSet(data) {
         new ormModel({
-            'account': data.account,
-            'jfVersion': data.jfVersion,
-            'openTime': data.openTime,
-            'source': data.source,
-            'userAgent': data.userAgent,
-            'appName': data.appName,
-            'platform': data.platform,
-            'appVersion': data.appVersion,
-            'domain': data.domain,
-            'localUrl': data.localUrl,
-            'title': data.title,
-            'referrer': data.referrer,
-            'lang': data.lang,
-            'sh': data.sh,
-            'sw': data.sh,
-            'cd': data.sh
+            account: data.account,
+            jfVersion: data.jfVersion,
+            openTime: data.openTime,
+            source: data.source,
+            userAgent: data.userAgent,
+            appName: data.appName,
+            platform: data.platform,
+            appVersion: data.appVersion,
+            domain: data.domain,
+            localUrl: data.localUrl,
+            title: data.title,
+            referrer: data.referrer,
+            lang: data.lang,
+            sh: data.sh,
+            sw: data.sh,
+            cd: data.sh,
+            projectId: data.id
         }).creat('browser');
     }
 
@@ -130,14 +163,15 @@ class editMysql {
         msg = msg.toString();
         oArr = oArr.toString();
         new ormModel({
-            'type': data.type,
-            'sMsg': msg || data.sMsg,
-            'sUrl': data.sUrl,
-            'sLine': data.sLine,
-            'sColu': data.sColu,
-            'eObj': oArr || data.eObj,
-            'sTime': data.sTime,
-            'browerType': data.browerType
+            type: data.type,
+            sMsg: msg || data.sMsg,
+            sUrl: data.sUrl,
+            sLine: data.sLine,
+            sColu: data.sColu,
+            eObj: oArr || data.eObj,
+            sTime: data.sTime,
+            browerType: data.browerType,
+            projectId: data.id
         }).creat('errorMessage');
     }
 
@@ -147,13 +181,14 @@ class editMysql {
 
     netMessageSet(data) {
         new ormModel({
-            'source': data.source,
-            'method': data.method,
-            'originalUrl': data.originalUrl,
-            'status': data.status,
-            't': data.t,
-            'time': data.time,
-            'msg': data.msg
+            source: data.source||'management',
+            method: data.method,
+            originalUrl: data.originalUrl,
+            status: data.status,
+            t: data.t,
+            time: data.time,
+            msg: data.msg,
+            projectId: data.id
         }).creat('netErrorMessage');
     }
 
@@ -162,7 +197,7 @@ class editMysql {
      */
 
     messageFindAll(currentPage, countPerPage) {
-        return new ormModel().findAndCountAll('messPush', currentPage, countPerPage);
+        return new ormModel().findAndCountAll('messPush', { 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
     }
 
     /**
@@ -175,7 +210,8 @@ class editMysql {
             content: data.content,
             isEnable: data.isEnable,
             time: data.time,
-            uerTypes: data.uerTypes
+            uerTypes: data.uerTypes,
+            projectId: data.id
         }).creat('messPush');
     }
 
@@ -192,7 +228,7 @@ class editMysql {
      */
 
     getPlugAn(name) {
-        return new ormModel().select('plugAn', name);
+        return new ormModel().select('plugAn', { where: { name: name } });
     }
 
     /**
@@ -203,8 +239,9 @@ class editMysql {
         return new ormModel({
             name: data.account,
             version: data.version,
-            time: data.time
-        }).returnCreat('plugAn');
+            time: data.time,
+            projectId: data.id
+        }).creat('plugAn');
     }
 
     /**
@@ -212,7 +249,7 @@ class editMysql {
      */
     
     getPlugAnListId(name) {
-        return new ormModel().selectPlugAnListInfoId('plugAnList', name);
+        return new ormModel().select('plugAnList', { where: { plugListName: name } });
     }
 
     /**
@@ -220,20 +257,21 @@ class editMysql {
      */
 
     getPlugFindAndCountAll(id) {
-        return new ormModel().plugFindAndCountAll('plugAnList', id);
+        return new ormModel().findAll('plugAnList', { where: { plugAnId: id } });
     }
 
     /**
      * @param andir 插件列表
      */
     
-    plugAnList(data, id) {
+    plugAnList(data) {
         new ormModel({
             plugListName: data.plugName,
             describe: data.describe,
             category: data.category,
             time: data.time,
-            plugAnId: id
+            plugAnId: data.plugAnId,
+            projectId: data.id
         }).creat('plugAnList');
     }
 
@@ -242,23 +280,23 @@ class editMysql {
      */
     
     deletePlugAnList(id) {
-        return new ormModel().deletePlugAnList('plugAnList', id);
+        return new ormModel().delete('plugAnList', { where: { id: id } });
     }
 
     /**
      * @param andir 插件列表id
      */
 
-    getPlugAnListInfoId(where) {
-        return new ormModel().getDataForOne('plugAnListInfo', where);
+    getPlugAnListInfoId(name, version) {
+        return new ormModel().select('plugAnListInfo', { where: { name: name, plugVersion: version } });
     }
 
     /**
      * @param andir 设置插件列表id
      */
 
-    getPlugAnListInfoIds(name) {
-        return new ormModel().selectPlugAnListInfoIds('plugAnListInfo', name);
+    getPlugAnListInfoIds(plugName) {
+        return new ormModel().select('plugAnListInfo', { where: { plugName: { '$like': '%' + plugName} } });
     }
     
     /**
@@ -266,7 +304,7 @@ class editMysql {
      */
 
     getPlugAnListInfoAll(id) {
-        return new ormModel().getPlugAnListInfoIdAll('plugAnListInfo', id);
+        return new ormModel().findAll('plugAnListInfo', { where: { plugAnListId: id } });
     }
 
      /**
@@ -274,7 +312,7 @@ class editMysql {
      */
 
     updatePlugAnListId(id, isEnable) {
-        new ormModel().setPlugupdate('plugAnListInfo', id, isEnable.isEnable);
+        new ormModel().update('plugAnListInfo', { isEnable: isEnable }, { where: { id: id } });
     }
 
     /**
@@ -282,7 +320,7 @@ class editMysql {
      */
 
     updateMessage(id, isEnable) {
-        new ormModel().setMessageupdate('messPush', id, isEnable.isEnable);
+        new ormModel().update('messPush', { isEnable: isEnable }, { where: { id } });
     }
 
     /**
@@ -290,7 +328,7 @@ class editMysql {
      */
 
     deletePlugAnListId(id) {
-        new ormModel().delPlugAnListInfo('plugAnListInfo', id);
+        new ormModel().delete('plugAnListInfo', { where: { id: id } });
     }
 
     /**
@@ -298,7 +336,7 @@ class editMysql {
      */
 
     deletePlugDownId(id) {
-        new ormModel().delPlugAnListInfo('plugDown', id);
+        new ormModel().delete('plugDown', { where: { id: id } });
     }
 
     /**
@@ -306,7 +344,7 @@ class editMysql {
      */
 
     deleteMessageId(id) {
-        new ormModel().delPlugAnListInfo('messPush', id);
+        new ormModel().delete('messPush', { where: { id: id } });
     }
 
     /**
@@ -314,14 +352,14 @@ class editMysql {
      */
 
     deletePlugAnId(id) {
-        new ormModel().deletePlugAnListId('plugAnListInfo', id);
+        new ormModel().delete('plugAnListInfo', { where: { id: id } });
     }
 
     /**
      * @param andir 插件列表版本
      */
   
-    plugAnListInfo(data, id) {
+    plugAnListInfo(data) {
         new ormModel({
             channl: data.channl,
             fileSize: data.fileSize,
@@ -335,7 +373,8 @@ class editMysql {
             textarea: data.textarea,
             time: data.time,
             version: data.version,
-            plugAnListId: id
+            plugAnListId: data.plugAnListId,
+            projectId: data.id
         }).creat('plugAnListInfo');
     }
 
@@ -344,7 +383,7 @@ class editMysql {
      */
 
     getPlugDownId(where) {
-        return new ormModel().getDataForOne('plugDown', where);
+        return new ormModel().findAll('plugDown', { where: where });
     }
 
     /**
@@ -370,7 +409,7 @@ class editMysql {
      */
 
     updatePlugDownId(data, a) {
-        return new ormModel().update('plugDown', data.sum + a, data.name);
+        return new ormModel().update('plugDown',  { sum: data.sum + a }, { where: { name: data.name } });  
     }
 
 	/**
@@ -387,9 +426,9 @@ class editMysql {
 
     getFindAllData(str, currentPage, countPerPage, id) {
         if (id) {
-            return new ormModel().idFindAndCountAll(str, currentPage, countPerPage, id);
+            return new ormModel().findAndCountAll(str, { where: { plugAnListId: id }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
         } else {
-            return new ormModel().findAndCountAll(str, currentPage, countPerPage);
+            return new ormModel().findAndCountAll(str, {'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
         }
     }
 
@@ -398,7 +437,7 @@ class editMysql {
      */
 
     getPlugAnListInfoData(version, channl, systemVer) {
-        return new ormModel().plugPlugAnInfo('plugAnListInfo', version, channl, systemVer);
+        return new ormModel().findAll('plugAnListInfo', { where: { channl, version, systemVer } });
     }
 
 
@@ -418,7 +457,7 @@ class editMysql {
      * @returns {*}
      */
     getData(str, where) {
-        return new ormModel().getData(str, where);
+        return new ormModel().findAll(str, { where: where });
     }
    
 }

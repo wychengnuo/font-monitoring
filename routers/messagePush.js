@@ -28,6 +28,10 @@ class messagePush {
 
         obj.time = moment().format('YYYY-MM-DD HH:mm:ss');
 
+        const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+        const dt = await new editMysql().selectProjects(da.roleId);
+        obj.id = dt.id;
+
         new editMysql().messPush(obj);
 
         ctx.body = {

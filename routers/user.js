@@ -14,6 +14,7 @@ const moment = require('moment');
  * 同时：登录逻辑，token逻辑完毕。
  * 写这里很郁闷，突然醍醐灌顶。。。
  * 遗留一个问题：数据库中 token字段到期后没有自动删除。。缺少一个事务。
+ * 但是每次更新token剔除掉就得token也可以达到效果
  * 
  */
 
@@ -27,19 +28,43 @@ class ApiUser {
 
         let d = ctx.request.body;
 
-        if (!d) {
-            ctx.body  = {
-                msg: '失败',
+        if (!d || d.password.length < 4) {
+            return ctx.body  = {
+                msg: '注册失败',
                 success: false,
-                data: {}
+                data: null
+            };
+        }
+
+        let isRole = await selectRole(d.department);
+
+        let role;
+
+        if (!isRole) {
+            // 查看部门是否存在
+            // 不存在创建，使用id作为外键值
+            role = await new editMysql().roleSet(d.department);
+        } else {
+            // 存在直接使用原有数据id作为外键值
+            role['id'] = isRole.id;
+        }
+
+        let isRegister = await isRegister(ctx);
+
+        if (isRegist.username == d.username) {
+            return ctx.body  = {
+                msg: '用户名已经存在，请查看用户名。',
+                success: false
             };
         }
 
         const token = crypt.creatToken(d);
 
-        const data = await new editMysql().userSet(d.username, d.nickname, d.password);
+        const data = await new editMysql().userSet(d.username, d.nickname, d.password, role.id);
 
-        new editMysql().tokenSet(token, data.id);
+        new editMysql().projectsSet(role.id);
+
+        new editMysql().tokenSet(token, data.id, role.id);
 
         ctx.cookies.set('token', token);
 
@@ -62,7 +87,7 @@ class ApiUser {
 
                 const tdata = crypt.creatToken(d);
 
-                new editMysql().tokenSet(tdata, isRegist.id);
+                new editMysql().tokenSet(tdata, isRegist.id, isRegist.roleId);
 
                 ctx.cookies.set('token', tdata);
 

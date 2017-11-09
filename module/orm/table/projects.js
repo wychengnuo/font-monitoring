@@ -1,7 +1,14 @@
 
 /**
  * @param 权限表
- * @param 权限表对应---》role表 
+ * @param 权限表对应---》role表
+ * 权限id暂时只分为app端和前端
+ * permissionsId： 
+ * 1 是整个前端，包含app
+ * 2 只是前端
+ * 3 只是app
+ * 现在暂时不分app还是前端，这张表是为了以后扩展而创建的，permissionsId 的默认值为 ‘1’.
+ * 重要的是现在暂时没有什么用。
  */
 
 module.exports = function (sequelize, DataTypes) {
@@ -10,7 +17,6 @@ module.exports = function (sequelize, DataTypes) {
         permissionsId: { type: DataTypes.STRING}   // 权限id
     },
         {
- 
             
         // 是否需要增加createdAt、updatedAt、deletedAt字段
             'timestamps': true,
