@@ -26,6 +26,9 @@ module.exports = function (sequelize, DataTypes) {
         // 将deletedAt字段改名
             'deletedAt': 'dtime'
         });
+        MessPush.associate = (models) => {
+            MessPush.belongsTo(models.projects);
+        };
     
     return MessPush;
 };

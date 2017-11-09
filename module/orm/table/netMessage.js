@@ -27,6 +27,10 @@ module.exports = function (sequelize, DataTypes) {
         // 将deletedAt字段改名
             'deletedAt': 'dtime'
         });
+
+        NetErrorMessage.associate = (models) => {
+            NetErrorMessage.belongsTo(models.projects);
+        };
     
     return NetErrorMessage;
 };

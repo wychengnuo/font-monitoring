@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         // Using additional options like CASCADE etc for demonstration
         // Can also simply do Task.belongsTo(models.User);
         PlugAnListInfo.belongsTo(models.plugAnList);
+        PlugAnListInfo.belongsTo(models.projects);
     };
     return PlugAnListInfo;
 };

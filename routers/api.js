@@ -25,7 +25,13 @@ class ApiController {
         
         if (ctx.request.body.account != d.account) {
 
-            new editMysql().browerSet(ctx.request.body);
+            const dt = await new editMysql().selectProjects(ctx.request.body.departmentId);
+
+            let da = ctx.request.body;
+
+            da.id = dt.id;
+
+            new editMysql().browerSet(da);
             
             ctx.body = {
                 msg: '成功',
@@ -50,30 +56,45 @@ class ApiController {
     // 存储端页面报错信息
     static async setHtmlError(ctx, next) {
 
-        if (!Object.keys(ctx.request.body).length) {
+        const data = ctx.request.body;
+
+        // return ctx.body = {
+        //     msg: '成功',
+        //     success: true
+        // };
+
+        if (!Object.keys(data).length || Object.keys(data)[0] === 'departmentId') {
             
-            ctx.body = {
+            return ctx.body = {
                 msg: '失败',
                 success: false
             };
 
-        } else {
-
-            const data = ctx.request.body;
-            const browerType = require('./../utils/getBrowserType')(ctx.headers['user-agent']);
-
-            for (let i in data) {
-                let d = JSON.parse(data[i]);
-                d.browerType = browerType;
-                new editMysql().errorMessageSet(d);
-            }
-
-            ctx.body = {
-                msg: '成功',
-                success: true,
-                body: ctx.request.body
-            };
         }
+        
+        const dt = await new editMysql().selectProjects(data.departmentId);
+
+        console.log(dt)
+
+        delete data.departmentId;
+
+        const browerType = require('./../utils/getBrowserType')(ctx.headers['user-agent']);
+
+        for (let i in data) {
+
+            let d = JSON.parse(data[i]);
+
+            d.browerType = browerType;
+
+            d.id = dt.id;
+            
+            new editMysql().errorMessageSet(d);
+        }
+
+        return ctx.body = {
+            msg: '成功',
+            success: true
+        };
         await next();
     }
 
@@ -178,12 +199,15 @@ class ApiController {
 
     static async setPlug(ctx, next) {
 
-        const m = ctx.request.body;
+        let m = ctx.request.body;
+
         let data = await new editMysql().getPlugAn(m.account);
 
         data = !data ? {} : data;
 
         if (data.plugName != m.account) {
+
+            m.id = data.projectId;
 
             new editMysql().plugAnSet(m);
             
@@ -237,6 +261,10 @@ class ApiController {
 
             const dt = await new editMysql().getPlugAnListId(ctx.request.body.plugName);
 
+            m.plugAnId = data.id;
+
+            m.id = dt.projectId;
+
             if (dt && dt.plugListName == ctx.request.body.plugName) {
                 return ctx.body = {
                     msg: '插件不能重复命名，请检查插件命名，重新输入。。',
@@ -244,7 +272,7 @@ class ApiController {
                 };
             } else {
 
-                new editMysql().plugAnList(m, data.id);
+                new editMysql().plugAnList(m);
 
                 return ctx.body = {
                     msg: '成功',
@@ -363,7 +391,10 @@ class ApiController {
 
         if (data.id) {
 
-            new editMysql().plugAnListInfo(o, data.id);
+            o.plugAnListId = data.id;
+            o.id = data.projectId;
+
+            new editMysql().plugAnListInfo(o);
         }
 
         ctx.redirect(ctx.headers.referer);
@@ -642,25 +673,19 @@ class ApiController {
         await next();
     }
 
-    /**
-     * 获取浏览器类型
-     * 由于没有对接mock系统，所以统计多有的浏览器没有任何意义。。。。
-     */
+}
 
-    // static async getBrowser(ctx, next) {
+/**
+ * @param 返回权限id
+ */
 
-    //     const d = await new editMysql().smembers(keys.browserType);
-        
-    //     const data = await brower(d);
+const projectId = async (ctx) => {
 
-    //     ctx.body = {
-    //         success: true,
-    //         data: data,
-    //         msg: '成功'
-    //     };
-        
-    //     await next();
-    // }
+    const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+    
+    const dt = await new editMysql().selectProjects(da.roleId);
+
+    return dt;
 }
 
 /**
@@ -682,23 +707,6 @@ const type = (d) => {
 
     return Object.values(a);
 };
-
-// const brower = (d) => {
-//     const a = d.reduce((pre, cur) => {
-//         const _cur = JSON.parse(cur)['type'];
-//         if (pre[_cur]) {
-//             pre[_cur].y++;
-//         } else {
-//             pre[_cur] = {
-//                 name: _cur,
-//                 y: 1
-//             };
-//         }
-//         return pre;
-//     }, {});
-
-//     return Object.values(a);
-// };
 
 /**
  * 分页处理

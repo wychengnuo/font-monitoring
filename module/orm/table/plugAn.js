@@ -22,8 +22,8 @@ module.exports = (sequelize, DataTypes) => {
         'deletedAt': 'dtime'
     });
         
-        // PlugAn.associate = (models) => {
-        //     User.hasMany(models.role);
-        // };
+    PlugAn.associate = (models) => {
+        PlugAn.belongsTo(models.projects);
+    };
     return PlugAn;
 };

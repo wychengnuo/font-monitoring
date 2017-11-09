@@ -27,7 +27,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
         let version = homeDir.split('/')[homeDir.split('/').length - 2];
 
         if (!global.b[obj.channel]) {
-            let adata = await new editMysql().getPlugAnListInfoId({ name: name, plugVersion: version });
+            let adata = await new editMysql().getPlugAnListInfoId(name, version);
             adata = !adata ? {} : adata;
             global.b[obj.channel] = adata;
         }

@@ -20,11 +20,11 @@ function getInterface() {
             loggers(ctx, start, err);
             throw err;
         } 
-        loggers(ctx, start);
+        await loggers(ctx, start);
     };
 }
 
-function loggers(ctx, start, err) {
+const loggers = async (ctx, start, err) => {
     const t = time(start);
     const status = err ? (err.status || 500) : (ctx.status || 404);
     const o = {};
@@ -36,7 +36,11 @@ function loggers(ctx, start, err) {
     o.time = moment().format('YYYY-MM-DD HH:mm:ss');
     if (ctx.originalUrl.indexOf('/plugin/api') === 0) {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
+        const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+        const dt = await new editMysql().selectProjects(da.roleId);
+        o.id = dt.id;
         new editMysql().netMessageSet(o);
+        
     }
 }
 
