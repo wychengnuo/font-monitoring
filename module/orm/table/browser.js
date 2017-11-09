@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
         referrer: { type: DataTypes.STRING },
         sh: { type: DataTypes.STRING },
         sw: { type: DataTypes.STRING },
-        cd: { type: DataTypes.STRING }
+        cd: { type: DataTypes.STRING } 
     },
         {
 
@@ -34,6 +34,10 @@ module.exports = function (sequelize, DataTypes) {
         // 将deletedAt字段改名
             'deletedAt': 'dtime'
         });
+    
+        Browser.associate = (models) => {
+            Browser.belongsTo(models.projects);
+        };
     
     return Browser;
 };
