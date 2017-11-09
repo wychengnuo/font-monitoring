@@ -447,7 +447,7 @@ class editMysql {
      * @returns {*}
      */
     getMessageByStatus(plant) {
-        return new ormModel().query('select content from messPushes where isEnable = TRUE and ' + plant + ' in (plant)');
+        return new ormModel().query('select content from messPushes where isEnable = TRUE and plant like "%' + plant + '%"');
     }
 
 	/**
@@ -459,7 +459,83 @@ class editMysql {
     getData(str, where) {
         return new ormModel().findAll(str, { where: where });
     }
-   
+
+    /**
+     * 根据where查找下载数据，分页
+     * @param currentPage
+     * @param pageSize
+     * @param plugChannel
+     * @param plugName
+     * @param plugVersion
+     * @returns {*}
+	 */
+    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, isCount) {
+        let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id ', str = '';
+        let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id ';
+
+        if (plugChannel != '') {
+            if (str !== '') {
+                str += ' AND ';
+            }
+            str = str + 'a.name = "' + plugChannel + '"';
+        }
+
+        if (plugName != '') {
+            if (str !== '') {
+                str += ' AND ';
+            }
+            str = str + 'b.name = "' + plugName + '"';
+        }
+
+        if (plugVersion != '') {
+            if (str !== '') {
+                str += ' AND ';
+            }
+            str = str + 'b.plugVersion = "' + plugVersion + '"';
+        }
+
+        if (str !== '') {
+            str = ' WHERE ' + str;
+        }
+
+        if (isCount) {
+            sqlCount += str;
+            return new ormModel().query(sqlCount);
+        } else {
+            sql += str;
+            if (currentPage && pageSize) {
+                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + currentPage * pageSize;
+            }
+            return new ormModel().query(sql);
+        }
+    }
+
+	/**
+     * 获取所有的插件下载渠道
+     * @returns {*}
+     */
+    getPlugChannelList() {
+        const sql = 'SELECT DISTINCT(name) AS channel from plugDowns';
+        return new ormModel().query(sql)
+    }
+
+	/**
+     * 获取所有的插件下载的名称
+     * @returns {*}
+     */
+    getPlugNamelList() {
+        const sql = 'SELECT DISTINCT(b.name) AS name FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id';
+        return new ormModel().query(sql)
+    }
+
+	/**
+     * 获取所有的插件下载的版本
+     * @returns {*}
+     */
+    getPlugVersionlList() {
+        const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id';
+        return new ormModel().query(sql)
+    }
 }
 
 module.exports = exports = editMysql;

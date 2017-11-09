@@ -57,14 +57,14 @@ class messagePush {
 
     static async getMessageByStatus(ctx) {
     
-        const { plant } = ctx.query;
+        const plant = ctx.query.plant;
 
         let data = await new editMysql().getMessageByStatus(plant);
-        if (data) {
+        if (data && data.length > 0) {
             ctx.body = {
                 success: true,
                 code: 1,
-                msg: data[0].content,
+                msg: data[0].content
             };
         } else {
             ctx.body = {
