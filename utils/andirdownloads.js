@@ -10,7 +10,7 @@ const editMysql = require('./../module/index');
 const throttle = require('lodash.throttle');
 
 const updateDate = throttle((b, id) => {
-    new editMysql().updatePlugDownId(b, id).then((data) => {
+    new editMysql().updatePlugDownId(b, id, projectId).then((data) => {
         global.a[b.id] = 0;
         global.d = 0;
         global.f = 0;
@@ -27,7 +27,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
         let version = homeDir.split('/')[homeDir.split('/').length - 2];
 
         if (!global.b[obj.channel]) {
-            let adata = await new editMysql().getPlugAnListInfoId(name, version);
+            let adata = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
             adata = !adata ? {} : adata;
             global.b[obj.channel] = adata;
         }
@@ -36,7 +36,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
 
             if (!global.e[obj.channel]) {
                 
-                let bdata = await new editMysql().getPlugDownId({ name: obj.channel, plugAnListInfoId: global.b[obj.channel].id });
+                let bdata = await new editMysql().getPlugDownId(global.b[obj.channel].id, projectId);
                 
                 bdata = !bdata ? {} : bdata;
     
@@ -51,7 +51,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
                 global.f++;
 
                 if (global.d >= 100) {
-                    updateDate(global.e[obj.channel], global.a[b.id]);
+                    updateDate(global.e[obj.channel], global.a[b.id], obj.projectId);
                 }
 
             } else {

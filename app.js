@@ -74,7 +74,8 @@ app.use(async (ctx, next) => {
                 networkType : ctx.headers['network_type'] || '',
                 romInfo : ctx.headers['rom_info'] || '',
                 appVersion : ctx.headers['sver'] || '',
-                imei : ctx.headers['imei'] || ''
+                imei: ctx.headers['imei'] || '',
+                projectId: ctx.headers['projectId'] || ''
             }
 
             require('./utils/andirdownloads')(ctx, obj, homeDir, next);

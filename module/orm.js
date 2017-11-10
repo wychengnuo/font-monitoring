@@ -40,7 +40,7 @@ class ormModel {
      * @param 数据库删除方法
      */
 
-    delete(str, token) {
+    delete(str, where) {
         db[str].destroy(where);
     }
 
