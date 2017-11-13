@@ -1,4 +1,3 @@
-
 /**
  * @param 统计插件下载量
  * @param 1、区分渠道下载量
@@ -9,65 +8,44 @@ const editMysql = require('./../module/index');
 
 const throttle = require('lodash.throttle');
 
-const updateDate = throttle((b, id) => {
-    new editMysql().updatePlugDownId(b, id, projectId).then((data) => {
-        global.a[b.id] = 0;
-        global.d = 0;
-        global.f = 0;
-        global.e = {};
-        global.b = {};
-    })
-}, 1500);
+const client = require('./../server/redis');
 
-module.exports = async (ctx, obj, homeDir, next) => {
-    
+const updateDate = throttle(async (f,d,obj) => {
+    let inc = await client.get(obj.channel);
+    if (typeof f !== 'undefined' && f.plugAnListInfoId === d.id) { 
+        new editMysql().updatePlugDownId(f.name, parseInt(inc), obj.projectId).then(() => {
+            global.c = 0;
+        })
+    } else {
+        new editMysql().plugDown(obj, d);
+    }
+}, 1000)
+
+module.exports = async(ctx, obj, homeDir, next) => {
 
     if (obj && obj.channel) {
+
         let name = homeDir.split('/')[homeDir.split('/').length - 3];
         let version = homeDir.split('/')[homeDir.split('/').length - 2];
 
-        if (!global.b[obj.channel]) {
-            let adata = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
-            adata = !adata ? {} : adata;
-            global.b[obj.channel] = adata;
-        }
+        global.c += 1;
+        
+        client.incr(obj.channel)
 
-        if (global.b[obj.channel].id) {
-
-            if (!global.e[obj.channel]) {
-                
-                let bdata = await new editMysql().getPlugDownId(global.b[obj.channel].id, projectId);
-                
-                bdata = !bdata ? {} : bdata;
-    
-                global.e[bdata.name] = bdata;
-                
-            }
+        if (parseInt(global.c) % 200 === 0) {
             
-            if (typeof global.e[obj.channel] !== 'undefined' && global.e[obj.channel].plugAnListInfoId === global.b[obj.channel].id) {
-                
-                global.a[b.id] = (global.a[b.id] || 0) + 1;
+            let d = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
 
-                global.f++;
+            let f = await new editMysql().getPlugDownId(obj.channel, d);
 
-                if (global.d >= 100) {
-                    updateDate(global.e[obj.channel], global.a[b.id], obj.projectId);
-                }
+            f = !f ? 'undefined' : f[0];
 
-            } else {
-
-                if (global.e[obj.channel] !== obj.channel) {
-                    new editMysql().plugDown(obj, global.b[obj.channel].id);
-                }
-                // next();
-
-            }   
+            updateDate(f, d, obj);
         }
-        // await next();
     }
     ctx.body = {
         success: false,
-        data: '不知道为啥，请求头字段暂不能为中文'
+        data: '暂无数据'
     };
-    
+
 };

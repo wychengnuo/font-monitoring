@@ -32,8 +32,8 @@ class ormModel {
      * @param 数据库更新方法
      */
 
-    update(str, where) { 
-        return db[str].update(where);
+    update(str, where, where1) { 
+        return db[str].update(where, where1);
     }
   
     /**

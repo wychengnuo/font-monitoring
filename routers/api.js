@@ -9,6 +9,8 @@ const path = require('path');
 
 const editMysql = require('./../module/index');
 
+const client = require('./../server/redis');
+
 /**
  * @param 接口暂时统一处理
  */
@@ -211,13 +213,13 @@ class ApiController {
 
         let project = await projectId(ctx);
 
-        let data = await new editMysql().getPlugAn(m.accountj, project.id);
+        let data = await new editMysql().getPlugAn(m.account, project.id);
 
         data = !data ? {} : data;
 
         if (data.plugName != m.account) {
 
-            m.id = data.projectId;
+            m.id = data.projectId ? data.projectId : project.id;
 
             new editMysql().plugAnSet(m);
 
@@ -277,7 +279,7 @@ class ApiController {
 
             m.plugAnId = data.id;
 
-            m.id = dt.projectId;
+            m.id = dt && dt.projectId ? dt.projectId : data.projectId;
 
             if (dt && dt.plugListName == ctx.request.body.plugName) {
                 return ctx.body = {
@@ -403,9 +405,7 @@ class ApiController {
          * 用于分页，供前端分页查看
          */
 
-        let project = await projectId(ctx);
-
-        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name, project.id);
+        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name, ctx.request.body.fields.projectId);
 
         data = !data ? {} : data;
 
@@ -595,38 +595,49 @@ class ApiController {
 
         let arr, obj = {},
             pieArray = [];
-
-        data.map(v => {
+        
+        
+        data.map(async (v) => {
+            let sumb = await client.get(v.name);
+            sumb = !sumb ? 0 : parseInt(sumb);
             arr = [];
             for (let j = 6; j >= 0; j--) {
+                
                 let date = moment().subtract(j, 'days').format('YYYY-MM-DD'),
                     count = 0;
-
+                
                 if (date == v.time) {
-                    count = v.sum;
+                    count = v.sum + sumb;
                 } else if (obj[v.name] && obj[v.name][6 - j] !== 0) {
                     count = obj[v.name][6 - j];
                 }
+                
                 arr.push(count);
             }
             obj[v.name] = arr;
         })
 
         if (data && data.length > 0) {
-            data.reduce((pre, cur, index, arr) => {
 
+            data.reduce(async (pre, cur, index, arr) => {
                 if (pre.name === cur.name) {
-                    cur.sum = pre.sum + cur.sum;
+                    let reSum = await client.get(cur.name);
+                    reSum = !reSum ? 0 : reSum;
+                    cur.sum = pre.sum + cur.sum + parseInt(reSum);
                 } else {
+                    let reSum = await client.get(pre.name);
+                    reSum = !reSum ? 0 : reSum;
                     pieArray.push({
-                        value: global.d < 100 ? (global.f === 0 ? pre.sum : global.f) : pre.sum + global.a[pre.id],
+                        value: pre.sum + parseInt(reSum),
                         name: pre.name
                     });
                 }
 
                 if (index === arr.length - 1) {
+                    let reSum = await client.get(cur.name);
+                    reSum = !reSum ? 0 : reSum;
                     pieArray.push({
-                        value: global.d < 100 ? (global.f === 0 ? cur.sum : global.f) : cur.sum + global.a[pre.id],
+                        value: cur.sum + parseInt(reSum),
                         name: cur.name
                     });
                 }

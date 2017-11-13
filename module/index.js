@@ -374,15 +374,15 @@ class editMysql {
      * @param 下载量累加
      */
 
-    getPlugDownId(id, projectId) {
-        return new ormModel().findAll('plugDown', { where: { name: obj.channel, plugAnListInfoId: id, projectId: projectId } });
+    getPlugDownId(channl, obj) {
+        return new ormModel().findAll('plugDown', { where: { name: channl, plugAnListInfoId: obj.id, projectId: obj.projectId } });
     }
 
     /**
      * @param 插件下载量统计
      */
 
-    async plugDown(data, id) {
+    async plugDown(data, obj) {
         new ormModel({
             name: data.channel,
             sum: 1,
@@ -392,7 +392,8 @@ class editMysql {
             romInfo: data.romInfo,
             appVersion: data.appVersion,
             imei: data.imei,
-            plugAnListInfoId: id
+            plugAnListInfoId: obj.id,
+            projectId: obj.projectId
         }).creat('plugDown');
     }
 
@@ -400,8 +401,8 @@ class editMysql {
      * @param 更新下载量id
      */
 
-    updatePlugDownId(data, a, projectId) {
-        return new ormModel().update('plugDown',  { sum: data.sum + a }, { where: { name: data.name, projectId: projectId } });  
+    updatePlugDownId(name, sum, projectId) {
+        return new ormModel().update('plugDown', { sum: sum}, { where: { name: name, projectId: projectId } });  
     }
 
 	/**
