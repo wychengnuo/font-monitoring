@@ -598,8 +598,6 @@ class ApiController {
         
         
         data.map(async (v) => {
-            let sumb = await client.get(v.name);
-            sumb = !sumb ? 0 : parseInt(sumb);
             arr = [];
             for (let j = 6; j >= 0; j--) {
                 
@@ -621,23 +619,17 @@ class ApiController {
 
             data.reduce(async (pre, cur, index, arr) => {
                 if (pre.name === cur.name) {
-                    let reSum = await client.get(cur.name);
-                    reSum = !reSum ? 0 : reSum;
-                    cur.sum = pre.sum + cur.sum + parseInt(reSum);
+                    cur.sum = pre.sum + cur.sum;
                 } else {
-                    let reSum = await client.get(pre.name);
-                    reSum = !reSum ? 0 : reSum;
                     pieArray.push({
-                        value: pre.sum + parseInt(reSum),
+                        value: pre.sum,
                         name: pre.name
                     });
                 }
 
                 if (index === arr.length - 1) {
-                    let reSum = await client.get(cur.name);
-                    reSum = !reSum ? 0 : reSum;
                     pieArray.push({
-                        value: cur.sum + parseInt(reSum),
+                        value: cur.sum,
                         name: cur.name
                     });
                 }
