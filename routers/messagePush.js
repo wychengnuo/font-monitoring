@@ -49,7 +49,7 @@ class messagePush {
 
         let data = await projectId(ctx);
 
-        await paging(ctx, 'messPush', data.id);
+        await paging(ctx, data.id);
         await next();
     }
 

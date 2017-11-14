@@ -211,7 +211,8 @@ class editMysql {
             isEnable: data.isEnable,
             time: data.time,
             uerTypes: data.uerTypes,
-            projectId: data.id
+            projectId: data.id,
+            plant: data.plant
         }).creat('messPush');
     }
 
@@ -304,7 +305,7 @@ class editMysql {
      */
 
     updatePlugAnListId(id, isEnable, projectId) {
-        new ormModel().update('plugAnListInfo', { isEnable: isEnable }, { where: { id: id, projectId: projectId } });
+        new ormModel().update('plugAnListInfo', { isEnable: isEnable.isEnable }, { where: { id: id, projectId: projectId } });
     }
 
     /**
@@ -312,7 +313,7 @@ class editMysql {
      */
 
     updateMessage(id, isEnable, projectId) {
-        new ormModel().update('messPush', { isEnable: isEnable }, { where: { id: id, projectId: projectId } });
+        new ormModel().update('messPush', { isEnable: isEnable.isEnable }, { where: { id: id, projectId: projectId } });
     }
 
     /**
