@@ -66,7 +66,7 @@ app.use(async (ctx, next) => {
                 romInfo : ctx.headers['rom_info'] || '',
                 appVersion : ctx.headers['sver'] || '',
                 imei: ctx.headers['imei'] || '',
-                projectId: ctx.headers['projectId'] ? ctx.headers['projectId'] : (ctx.headers['projectid'] || '')
+                projectId: ctx.headers['projectId'] ? ctx.headers['projectId'] : (ctx.headers['projectid'] || 1)
             }
 
             require('./utils/andirdownloads')(ctx, obj, homeDir, next);

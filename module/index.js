@@ -249,8 +249,8 @@ class editMysql {
      * @param andir 插件列表id
      */
     
-    getPlugAnListId(name, projectId) {
-        return new ormModel().select('plugAnList', { where: { plugListName: name, projectId: projectId } });
+    getPlugAnListId(name, id, projectId) {
+        return new ormModel().select('plugAnList', { where: { plugListName: name, id: id, projectId: projectId } });
     }
 
     /**
@@ -296,7 +296,7 @@ class editMysql {
      * @param 根据插件列表id，查询其所有列表详情插件
      */
 
-    getPlugAnListInfoAll(id) {
+    getPlugAnListInfoAll(id, projectId) {
         return new ormModel().findAll('plugAnListInfo', { where: { plugAnListId: id, projectId: projectId } });
     }
 
@@ -449,8 +449,8 @@ class editMysql {
      * @param where
      * @returns {*}
      */
-    getData(str, projectId) {
-        return new ormModel().findAll(str, { where: { id: id, projectId: projectId } });
+    getData(str, id) {
+        return new ormModel().findAll(str, { where: { id: id } });
     }
 
     /**

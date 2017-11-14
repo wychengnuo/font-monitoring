@@ -405,7 +405,7 @@ class ApiController {
          * 用于分页，供前端分页查看
          */
 
-        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name, ctx.request.body.fields.projectId);
+        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name, ctx.request.body.fields.id, ctx.request.body.fields.projectId);
 
         data = !data ? {} : data;
 
@@ -485,7 +485,7 @@ class ApiController {
              * 删除数据库字段
              */
 
-            const data = await new editMysql().getData('plugAnListInfo', project.id);
+            const data = await new editMysql().getData('plugAnListInfo', id);
             if (data && data.length > 0) {
                 const homeDir = path.resolve(__dirname, '..');
                 const newpath = homeDir + '/public/download/' + pathName + '/' + version + '/' + data[0].plugName;
