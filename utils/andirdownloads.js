@@ -15,7 +15,7 @@ const updateDate = throttle(async (f, d, obj) => {
 }, 1000);
 
 const date = async (f, d, obj) => {
-    let inc = await client.get(obj.channel);
+    let inc = await client.get('gm_front_' + obj.channel);
     if (typeof f !== 'undefined' && f.plugAnListInfoId === d.id) { 
         new editMysql().updatePlugDownId(f.name, parseInt(inc), obj.projectId).then(() => {
             global.c = 0;
@@ -36,17 +36,17 @@ module.exports = async (ctx, obj, homeDir, next) => {
 
         global.c += 1;
         
-        client.incr(obj.channel)
+        client.incr('gm_front_' + obj.channel)
 
         if (parseInt(global.c) < 200) {
 
             // clearInterval(set)
 
-            let inc = await client.get(obj.channel);
+            let inc = await client.get('gm_front_' + obj.channel);
 
             set = setInterval(async () => {
 
-                let incr = await client.get(obj.channel);
+                let incr = await client.get('gm_front_' + obj.channel);
 
                 if (parseInt(inc) === parseInt(incr)) {
 
