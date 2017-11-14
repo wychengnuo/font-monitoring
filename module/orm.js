@@ -16,8 +16,16 @@ class ormModel {
      * @param 同步数据库model事件
      */
 
-    creat(str) {
-        return db[str].create(...this.args);
+    creat(str) {                                 
+        return db[str].create(...this.args)
+    }
+
+    /**
+     * @param 同步数据model事件，同时创建多条记录
+     */
+
+    bulkCreate(str) {
+        return db[str].bulkCreate(...this.args);
     }
 
     /**

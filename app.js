@@ -53,7 +53,7 @@ app.use(async (ctx, next) => {
      * 兼容api不走下载
      */
    
-    if (ctx.originalUrl.indexOf('/public/download') == 0) {
+    if (ctx.originalUrl.indexOf('/public/download') == 0 && ctx.method === 'GET') {
 
         try {
             const homeDir = decodeURIComponent(ctx.path);

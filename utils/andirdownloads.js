@@ -10,56 +10,43 @@ const throttle = require('lodash.throttle');
 
 const client = require('./../server/redis');
 
-const updateDate = throttle(async (f, d, obj) => {
-    await date(f, d, obj);
+const updateDate = throttle(async (d, obj) => {
+    await date(d, obj);
 }, 1000);
 
-const date = async (f, d, obj) => {
-    let inc = await client.get('gm_front_' + obj.channel);
-    if (typeof f !== 'undefined' && f.plugAnListInfoId === d.id) { 
-        new editMysql().updatePlugDownId(f.name, parseInt(inc), obj.projectId).then(() => {
-            global.c = 0;
-        })
-    } else {
-        new editMysql().plugDown(obj, d);
-    }
+const date = async (d, obj) => {
+
+    let incrDate = await client.lrange('gm_front_' + obj.channel, 0, -1);
+    incrDate = incrDate.map(JSON.parse);
+
+    new editMysql().plugDown(incrDate, d).then(() => {
+        global.c = 0;
+        clearInterval(set);
+        client.del('gm_front_' + obj.channel);
+    })
 }
 
-module.exports = async (ctx, obj, homeDir, next) => {
-    
-    let set;
+let set;
 
-    if (obj && obj.channel) {
+module.exports = async (ctx, obj, homeDir, next) => {
+     
+    if (obj) {
 
         let name = homeDir.split('/')[homeDir.split('/').length - 3];
         let version = homeDir.split('/')[homeDir.split('/').length - 2];
 
         global.c += 1;
         
-        client.incr('gm_front_' + obj.channel)
+        client.lpush('gm_front_' + obj.channel, JSON.stringify(obj));
 
         if (parseInt(global.c) < 200) {
 
-            // clearInterval(set)
-
-            let inc = await client.get('gm_front_' + obj.channel);
-
             set = setInterval(async () => {
 
-                let incr = await client.get('gm_front_' + obj.channel);
+                let d = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
 
-                if (parseInt(inc) === parseInt(incr)) {
+                date(d, obj);
 
-                    let d = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
-                    
-                    let f = await new editMysql().getPlugDownId(obj.channel, d);
-        
-                    f = !f ? 'undefined' : f[0];
-
-                    date(f, d, obj);
-
-                    clearInterval(set);
-                }
             },3000)
         }
 
@@ -67,11 +54,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
             
             let d = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
 
-            let f = await new editMysql().getPlugDownId(obj.channel, d);
-
-            f = !f ? 'undefined' : f[0];
-
-            updateDate(f, d, obj);
+            updateDate(d, obj);
         }
     }
     ctx.body = {

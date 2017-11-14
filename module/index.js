@@ -384,18 +384,21 @@ class editMysql {
      */
 
     async plugDown(data, obj) {
-        new ormModel({
-            name: data.channel,
+
+        const model = data.map(v => ({
+            name: v.channel,
             sum: 1,
-            mobileModel: data.mobileModel,
-            mobileVersion: data.mobileVersion,
-            networkType: data.networkType,
-            romInfo: data.romInfo,
-            appVersion: data.appVersion,
-            imei: data.imei,
-            plugAnListInfoId: obj.id,
-            projectId: obj.projectId
-        }).creat('plugDown');
+            mobileModel: v.mobileModel,
+            mobileVersion: v.mobileVersion,
+            networkType: v.networkType,
+            romInfo: v.romInfo,
+            appVersion: v.appVersion,
+            imei: v.imei,
+            plugAnListInfoId: obj && obj.id || 1,
+            projectId: obj && obj.projectId || 2
+        }));
+
+        return new ormModel(model).bulkCreate('plugDown');
     }
 
     /**
@@ -462,7 +465,7 @@ class editMysql {
      * @param plugVersion
      * @returns {*}
 	 */
-    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, projectId, isCount) {
+    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, mobileModel, projectId, isCount) {
         let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId, str = '';
         let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId;
 
@@ -487,6 +490,13 @@ class editMysql {
             str = str + 'b.plugVersion = "' + plugVersion + '"';
         }
 
+        if(mobileModel != '') {
+            if(str !== '') {
+                str += ' AND ';
+            }
+            str = str + 'a.mobileModel = "' + mobileModel + '"';
+        }
+
         if (str !== '') {
             str = ' WHERE ' + str;
         }
@@ -497,7 +507,7 @@ class editMysql {
         } else {
             sql += str;
             if (currentPage && pageSize) {
-                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + currentPage * pageSize;
+                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + pageSize;
             }
             return new ormModel().query(sql);
         }
@@ -527,6 +537,14 @@ class editMysql {
      */
     getPlugVersionlList(projectId) {
         const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId =' + projectId;
+        return new ormModel().query(sql)
+    }
+
+    /**
+     * @param 获取所有下载的手机版本
+     */
+    getMobileModel(projectId) {
+        const sql = 'SELECT DISTINCT(a.mobileModel) FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId =' + projectId;
         return new ormModel().query(sql)
     }
 }
