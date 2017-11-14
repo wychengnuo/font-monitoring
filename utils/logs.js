@@ -28,7 +28,7 @@ const loggers = async (ctx, start, err) => {
     const t = time(start);
     const status = err ? (err.status || 500) : (ctx.status || 404);
     const o = {};
-    o.source = ctx.source || 'monitoring';
+    o.source = ctx.source || 'management';
     o.method = ctx.method;
     o.originalUrl = ctx.originalUrl;
     o.status = status;
@@ -36,6 +36,12 @@ const loggers = async (ctx, start, err) => {
     o.time = moment().format('YYYY-MM-DD HH:mm:ss');
     if (ctx.originalUrl.indexOf('/plugin/api') === 0) {
         o.msg = ctx.body ? ctx.body.msg : '服务端内部错误';
+        if (!ctx.headers.cookie) {
+            return ctx.body = {
+                    success: true,
+                    msg: '无数据'
+            }
+        }
         const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
         const dt = await new editMysql().selectProjects(da.roleId);
         o.id = dt.id;

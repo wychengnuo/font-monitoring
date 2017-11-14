@@ -1,4 +1,3 @@
-
 const moment = require('moment');
 
 const fs = require('fs');
@@ -10,6 +9,8 @@ const path = require('path');
 
 const editMysql = require('./../module/index');
 
+const client = require('./../server/redis');
+
 /**
  * @param 接口暂时统一处理
  */
@@ -19,26 +20,26 @@ class ApiController {
     // 存储用户版本信息
     static async setBasic(ctx, next) {
 
-        let data = await new editMysql().getBrowerSet(ctx.request.body.account);
-        
-        let d = !data ? {} : data;
-        
-        if (ctx.request.body.account != d.account) {
+        const dt = await new editMysql().selectProjects(ctx.request.body.departmentId);
 
-            const dt = await new editMysql().selectProjects(ctx.request.body.departmentId);
+        let data = await new editMysql().getBrowerSet(ctx.request.body.account, dt.id);
+
+        let d = !data ? {} : data;
+
+        if (ctx.request.body.account != d.account) {
 
             let da = ctx.request.body;
 
             da.id = dt.id;
 
             new editMysql().browerSet(da);
-            
+
             ctx.body = {
                 msg: '成功',
                 success: true
-            };  
+            };
         }
-        
+
         ctx.body = {
             msg: '失败',
             success: false
@@ -49,7 +50,8 @@ class ApiController {
 
     //获取用户版本信息    
     static async getBasic(ctx, next) {
-        await paging(ctx, 'browser');
+        let project = await projectId(ctx);
+        await paging(ctx, 'browser', project.id);
         await next();
     }
 
@@ -58,20 +60,15 @@ class ApiController {
 
         const data = ctx.request.body;
 
-        // return ctx.body = {
-        //     msg: '成功',
-        //     success: true
-        // };
-
         if (!Object.keys(data).length || Object.keys(data)[0] === 'departmentId') {
-            
+
             return ctx.body = {
                 msg: '失败',
                 success: false
             };
 
         }
-        
+
         const dt = await new editMysql().selectProjects(data.departmentId);
 
         console.log(dt)
@@ -87,7 +84,7 @@ class ApiController {
             d.browerType = browerType;
 
             d.id = dt.id;
-            
+
             new editMysql().errorMessageSet(d);
         }
 
@@ -100,27 +97,31 @@ class ApiController {
 
     // 获取前端页面报错信息
     static async getHtmlError(ctx, next) {
-        await paging(ctx, 'errorMessage');
+        let project = await projectId(ctx);
+        await paging(ctx, 'errorMessage', project.id);
         await next();
     }
 
     // 后端接口报错分页查询pageError
 
     static async pageError(ctx, next) {
-
-        await paging(ctx, 'netErrorMessage');
+        let project = await projectId(ctx);
+        await paging(ctx, 'netErrorMessage', project.id);
         await next();
     }
 
     // 对返回错误信息进行处理 
     static async getTypeErr(ctx, next) {
-        const d = await new editMysql().getErrorMessageCount('errorMessage');
-        
-        let array, pieArray = [], obj = {};
+        let project = await projectId(ctx);
+        const d = await new editMysql().getErrorMessageCount(project.id);
+
+        let array, pieArray = [],
+            obj = {};
         d.map((v) => {
             array = [];
             for (let j = 6; j >= 0; j--) {
-                let date = moment().subtract(j, 'days').format('YYYY-MM-DD'), count = 0;
+                let date = moment().subtract(j, 'days').format('YYYY-MM-DD'),
+                    count = 0;
 
                 if (date == v.sTime) {
                     count = v.count;
@@ -137,11 +138,17 @@ class ApiController {
                 if (pre.type === cur.type) {
                     cur.count = pre.count + cur.count;
                 } else {
-                    pieArray.push({value: pre.count, name: pre.type});
+                    pieArray.push({
+                        value: pre.count,
+                        name: pre.type
+                    });
                 }
 
                 if (index === arr.length - 1) {
-                    pieArray.push({ value: cur.count, name: cur.type });
+                    pieArray.push({
+                        value: cur.count,
+                        name: cur.type
+                    });
                 }
                 return cur;
             })
@@ -166,7 +173,10 @@ class ApiController {
     // 对接口错误信息返回进行处理
 
     static async getUrlErr(ctx, next) {
-        const d = await new editMysql().getErrorMessageSet();
+
+        let project = await projectId(ctx);
+
+        const d = await new editMysql().getErrorMessageSet(project.id);
 
         let array, obj = {};
         d.map(v => {
@@ -201,16 +211,18 @@ class ApiController {
 
         let m = ctx.request.body;
 
-        let data = await new editMysql().getPlugAn(m.account);
+        let project = await projectId(ctx);
+
+        let data = await new editMysql().getPlugAn(m.account, project.id);
 
         data = !data ? {} : data;
 
         if (data.plugName != m.account) {
 
-            m.id = data.projectId;
+            m.id = data.projectId ? data.projectId : project.id;
 
             new editMysql().plugAnSet(m);
-            
+
             ctx.body = {
                 msg: '成功',
                 success: true
@@ -228,16 +240,18 @@ class ApiController {
 
     static async getPlug(ctx, next) {
 
-        const data = await new editMysql().getPlugAnAll();
-        
+        let project = await projectId(ctx);
+
+        const data = await new editMysql().getPlugAnAll(project.id);
+
         if (data && data.length > 0) {
-    
+
             ctx.body = {
                 data: data,
                 msg: '成功',
                 success: true
             };
-    
+
         } else {
             ctx.body = {
                 data: [],
@@ -257,13 +271,15 @@ class ApiController {
 
         if (m.plugName) {
 
-            const data = await new editMysql().getPlugAn(m.category);
+            let project = await projectId(ctx);
 
-            const dt = await new editMysql().getPlugAnListId(ctx.request.body.plugName);
+            const data = await new editMysql().getPlugAn(m.category, project.id);
+
+            const dt = await new editMysql().getPlugAnListId(ctx.request.body.plugName, project.id);
 
             m.plugAnId = data.id;
 
-            m.id = dt.projectId;
+            m.id = dt && dt.projectId ? dt.projectId : data.projectId;
 
             if (dt && dt.plugListName == ctx.request.body.plugName) {
                 return ctx.body = {
@@ -291,19 +307,23 @@ class ApiController {
     // 添加项目--获取分组项目
 
     static async getPlugList(ctx, next) {
-        const str = ctx.query.category;
-        const data = await new editMysql().getPlugAn(str);
 
-        const d = await new editMysql().getPlugFindAndCountAll(data.id);
-        
+        const str = ctx.query.category;
+
+        let project = await projectId(ctx);
+
+        const data = await new editMysql().getPlugAn(str, project.id);
+
+        const d = await new editMysql().getPlugFindAndCountAll(data.id, project.id);
+
         if (d && d.length > 0) {
-            
+
             ctx.body = {
                 data: d,
                 msg: '成功',
                 success: true
             };
-            
+
         } else {
             ctx.body = {
                 data: [],
@@ -322,7 +342,7 @@ class ApiController {
         /**
          * 存储文件
          */
-        
+
         const file = ctx.request.body.files.file;
 
         let version = ctx.request.body.fields.plugVersion;
@@ -385,7 +405,7 @@ class ApiController {
          * 用于分页，供前端分页查看
          */
 
-        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name);
+        let data = await new editMysql().getPlugAnListId(ctx.request.body.fields.name, ctx.request.body.fields.id, ctx.request.body.fields.projectId);
 
         data = !data ? {} : data;
 
@@ -402,15 +422,14 @@ class ApiController {
         await next();
     }
 
-    /**
-     * 查看项目 -- 分组项目 -- 详情插件
-     */
+    // 查看项目 -- 分组项目 -- 详情插件
 
     static async getPlugListInfo(ctx, next) {
 
-        const id = ctx.query.id;
+        let project = await projectId(ctx);
+        const plugAnListId = ctx.query.id;
 
-        await paging(ctx, 'plugAnListInfo', id);
+        await paging(ctx, 'plugAnListInfo', project.id, plugAnListId);
         await next();
     }
 
@@ -421,8 +440,15 @@ class ApiController {
      */
 
     static async settingPlug(ctx, next) {
-     
-        const { num, pathName, id, version } = ctx.request.body;
+
+        const {
+            num,
+            pathName,
+            id,
+            version
+        } = ctx.request.body;
+
+        let project = await projectId(ctx);
 
         let isEnable = {};
 
@@ -447,7 +473,7 @@ class ApiController {
 
         if (num == '1' || num == '2') {
 
-            new editMysql().updatePlugAnListId(id, isEnable);
+            new editMysql().updatePlugAnListId(id, isEnable, project.id);
 
             ctx.body = {
                 success: true,
@@ -459,7 +485,7 @@ class ApiController {
              * 删除数据库字段
              */
 
-            const data = await new editMysql().getData('plugAnListInfo', { id: id })
+            const data = await new editMysql().getData('plugAnListInfo', id);
             if (data && data.length > 0) {
                 const homeDir = path.resolve(__dirname, '..');
                 const newpath = homeDir + '/public/download/' + pathName + '/' + version + '/' + data[0].plugName;
@@ -467,13 +493,13 @@ class ApiController {
                     fs.unlink(newpath);
                 }
 
-                let dt = await new editMysql().getPlugAnListInfoAll(id);
+                let dt = await new editMysql().getPlugAnListInfoAll(id, project.id);
 
                 if (dt && dt.length > 0) {
-                    new editMysql().deletePlugDownId(dt[0].id);
+                    new editMysql().deletePlugDownId(dt[0].id, project.id);
                 }
 
-                new editMysql().deletePlugAnListId(id);
+                new editMysql().deletePlugAnListId(id, project.id);
 
                 ctx.body = {
                     success: true,
@@ -488,8 +514,10 @@ class ApiController {
     /**
      * del 删除分组项目
      */
-    
+
     static async delPlug(ctx, next) {
+
+        let project = await projectId(ctx);
 
         const plugName = ctx.request.body.plugName;
 
@@ -499,23 +527,24 @@ class ApiController {
 
         const newpath = homeDir + '/public/download/' + plugName;
 
+
         /**
          * 遍历删除文件
          */
 
         deleteFolder(newpath);
-        const data = await new editMysql().getPlugAnListId(plugName);
+        const data = await new editMysql().getPlugAnListId(plugName, project.id);
 
-        const dataAll = await new editMysql().getPlugAnListInfoAll(data.id);
+        const dataAll = await new editMysql().getPlugAnListInfoAll(data.id, project.id);
 
         if (dataAll.length) {
 
-            await new editMysql().deletePlugAnId(dataAll[0].plugAnListId);
+            await new editMysql().deletePlugAnId(dataAll[0].plugAnListId, project.id);
 
-            await new editMysql().deletePlugAnList(plugName);
+            await new editMysql().deletePlugAnList(plugName, project.id);
 
         } else {
-            await new editMysql().deletePlugAnList(id);
+            await new editMysql().deletePlugAnList(id, project.id);
         }
 
         ctx.body = {
@@ -531,10 +560,11 @@ class ApiController {
      */
 
     static async isLogin(ctx, next) {
+
         const token = ctx.cookies.get('token');
 
         if (!token) {
-            ctx.body = {
+            return ctx.body = {
                 msg: '请登录',
                 success: false
             };
@@ -556,41 +586,52 @@ class ApiController {
         await next();
     }
 
-    /**
-     * 获取下载量（一周）
-     */
+    // 获取下载量（一周）
 
     static async getPlugDownloads(ctx, next) {
-        const data = await new editMysql().getPlugDownLoads();
 
-        let arr, obj = {}, pieArray = [];
+        let project = await projectId(ctx);
+        const data = await new editMysql().getPlugDownLoads(project.id);
 
-        data.map(v => {
+        let arr, obj = {},
+            pieArray = [];
+        
+        
+        data.map(async (v) => {
             arr = [];
             for (let j = 6; j >= 0; j--) {
-                let date = moment().subtract(j, 'days').format('YYYY-MM-DD'), count = 0;
-
+                
+                let date = moment().subtract(j, 'days').format('YYYY-MM-DD'),
+                    count = 0;
+                
                 if (date == v.time) {
-                    count = v.sum;
+                    count = v.sum + sumb;
                 } else if (obj[v.name] && obj[v.name][6 - j] !== 0) {
                     count = obj[v.name][6 - j];
                 }
+                
                 arr.push(count);
             }
             obj[v.name] = arr;
         })
 
         if (data && data.length > 0) {
-            data.reduce((pre, cur, index, arr) => {
 
+            data.reduce(async (pre, cur, index, arr) => {
                 if (pre.name === cur.name) {
                     cur.sum = pre.sum + cur.sum;
                 } else {
-                    pieArray.push({value: global.d < 100 ? (global.f === 0 ? pre.sum : global.f) : pre.sum + global.a[pre.id], name: pre.name});
+                    pieArray.push({
+                        value: pre.sum,
+                        name: pre.name
+                    });
                 }
 
                 if (index === arr.length - 1) {
-                    pieArray.push({ value: global.d < 100 ? (global.f === 0 ? cur.sum : global.f) : cur.sum + global.a[pre.id], name: cur.name });
+                    pieArray.push({
+                        value: cur.sum,
+                        name: cur.name
+                    });
                 }
                 return cur;
             })
@@ -613,15 +654,12 @@ class ApiController {
         await next();
     }
 
-
     static async getPlugSearch(ctx, next) {
-        // let name = ctx.request.name;
-        // let channel = ctx.request.channel;
-        // let appVersion = ctx.request.appVersion;
 
-        let channelList = await new editMysql().getPlugChannelList();
-        let nameList = await new editMysql().getPlugNamelList();
-        let versionList = await new editMysql().getPlugVersionlList();
+        let project = await projectId(ctx);
+        let channelList = await new editMysql().getPlugChannelList(project.id);
+        let nameList = await new editMysql().getPlugNamelList(project.id);
+        let versionList = await new editMysql().getPlugVersionlList(project.id);
 
         let data = {
             channelList: channelList || [],
@@ -638,12 +676,11 @@ class ApiController {
         next();
     }
 
-    /**
-     * 获取下载量（全部）
-     */
+    // 获取下载量（全部）
 
     static async getPlugDownList(ctx, next) {
 
+        let project = await projectId(ctx);
         let currentPage = ctx.query.page ? ctx.query.page : 1;
         let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
         let plugChannel = ctx.query.channel || '';
@@ -651,21 +688,27 @@ class ApiController {
         let plugVersion = ctx.query.version || '';
 
         let data = await new editMysql().getPlugDownList(Number(currentPage), Number(countPerPage), plugChannel,
-            plugName, plugVersion);
+            plugName, plugVersion, project.id);
         let obj = await new editMysql().getPlugDownList(Number(currentPage), Number(countPerPage), plugChannel,
-            plugName, plugVersion, true);
+            plugName, plugVersion, project.id, true);
 
         if (obj.length > 0 && obj[0].count > 0) {
             ctx.body = {
                 success: true,
-                data: {list: data, totalCount: Math.ceil(obj[0].count / Number(countPerPage))},
+                data: {
+                    list: data,
+                    totalCount: Math.ceil(obj[0].count / Number(countPerPage))
+                },
                 msg: '成功',
                 pageSize: Math.ceil(data.length / Number(countPerPage))
             };
         } else {
             ctx.body = {
                 success: false,
-                data: {list: [], totalCount:0},
+                data: {
+                    list: [],
+                    totalCount: 0
+                },
                 msg: '失败'
             };
         }
@@ -679,10 +722,10 @@ class ApiController {
  * @param 返回权限id
  */
 
-const projectId = async (ctx) => {
+const projectId = async(ctx) => {
 
     const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
-    
+
     const dt = await new editMysql().selectProjects(da.roleId);
 
     return dt;
@@ -712,12 +755,12 @@ const type = (d) => {
  * 分页处理
  */
 
-const paging = async(ctx, str, where) => {
+const paging = async(ctx, str, projectId, plugAnListId) => {
 
     let currentPage = ctx.query.page ? ctx.query.page : 1;
     let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
 
-    let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), where);
+    let data = await new editMysql().getFindAllData(str, Number(currentPage), Number(countPerPage), projectId, plugAnListId);
 
     if (data.rows.length) {
         ctx.body = {
@@ -754,26 +797,23 @@ let deleteFolder = (newpath) => {
             filess = fs.readdirSync(newpath + '/' + files);
 
             filess.forEach(function (file, index) {
-                
+
                 let curPath = newpath + '/' + files + '/' + file;
-                
-    
+
+
                 if (fs.statSync(curPath).isDirectory()) { // recurse
-    
+
                     this.deleteFolter(curPath);
-    
+
                 } else {
-    
+
                     fs.unlinkSync(curPath);
-    
+
                 }
             });
             fs.rmdirSync(newpath + '/' + files);
             fs.rmdirSync(newpath);
         }
-
-        
-        
     }
 };
 

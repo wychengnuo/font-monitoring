@@ -36,7 +36,7 @@ class ApiUser {
             };
         }
 
-        let isRole = await selectRole(d.department);
+        let isRole = await new editMysql().selectRole(d.department);
 
         let role;
 
@@ -45,11 +45,12 @@ class ApiUser {
             // 不存在创建，使用id作为外键值
             role = await new editMysql().roleSet(d.department);
         } else {
+            role = {};
             // 存在直接使用原有数据id作为外键值
             role['id'] = isRole.id;
         }
 
-        let isRegister = await isRegister(ctx);
+        let isRegist = await isRegister(ctx);
 
         if (isRegist.username == d.username) {
             return ctx.body  = {

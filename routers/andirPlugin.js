@@ -24,9 +24,9 @@ class andirApiController {
 
     static async andirAppPlugin(ctx, next) {
 
-        const { version, channl, systemVer } = ctx.query;
+        const { version, channl, systemVer, projectId } = ctx.query;
 
-        let data = await new editMysql().getPlugAnListInfoData(version, channl, systemVer);
+        let data = await new editMysql().getPlugAnListInfoData(version, channl, systemVer, projectId);
 
         if (!data.length) {
             return ctx.body = {
