@@ -24,7 +24,7 @@ class andirApiController {
 
     static async andirAppPlugin(ctx, next) {
 
-        const { version, channl, systemVer, projectId } = ctx.query;
+        const { version, channl, systemVer } = ctx.query;
 
         let projectId = 1;
 

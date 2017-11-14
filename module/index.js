@@ -384,18 +384,21 @@ class editMysql {
      */
 
     async plugDown(data, obj) {
-        new ormModel({
-            name: data.channel,
+
+        const model = data.map(v => ({
+            name: v.channel,
             sum: 1,
-            mobileModel: data.mobileModel,
-            mobileVersion: data.mobileVersion,
-            networkType: data.networkType,
-            romInfo: data.romInfo,
-            appVersion: data.appVersion,
-            imei: data.imei,
-            plugAnListInfoId: obj.id,
-            projectId: obj.projectId
-        }).creat('plugDown');
+            mobileModel: v.mobileModel,
+            mobileVersion: v.mobileVersion,
+            networkType: v.networkType,
+            romInfo: v.romInfo,
+            appVersion: v.appVersion,
+            imei: v.imei,
+            plugAnListInfoId: obj && obj.id || 1,
+            projectId: obj && obj.projectId || 2
+        }));
+
+        return new ormModel(model).bulkCreate('plugDown');
     }
 
     /**

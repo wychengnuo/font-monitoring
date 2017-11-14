@@ -21,6 +21,14 @@ class ormModel {
     }
 
     /**
+     * @param 同步数据model事件，同时创建多条记录
+     */
+
+    bulkCreate(str) {
+        return db[str].bulkCreate(...this.args);
+    }
+
+    /**
      * @param 数据查询方法
      */
 
