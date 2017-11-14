@@ -465,7 +465,7 @@ class editMysql {
      * @param plugVersion
      * @returns {*}
 	 */
-    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, projectId, isCount) {
+    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, mobileModel, projectId, isCount) {
         let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId, str = '';
         let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId;
 
@@ -490,6 +490,13 @@ class editMysql {
             str = str + 'b.plugVersion = "' + plugVersion + '"';
         }
 
+        if(mobileModel != '') {
+            if(str !== '') {
+                str += ' AND ';
+            }
+            str = str + 'a.mobileModel = "' + mobileModel + '"';
+        }
+
         if (str !== '') {
             str = ' WHERE ' + str;
         }
@@ -500,7 +507,7 @@ class editMysql {
         } else {
             sql += str;
             if (currentPage && pageSize) {
-                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + currentPage * pageSize;
+                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + pageSize;
             }
             return new ormModel().query(sql);
         }
@@ -530,6 +537,14 @@ class editMysql {
      */
     getPlugVersionlList(projectId) {
         const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId =' + projectId;
+        return new ormModel().query(sql)
+    }
+
+    /**
+     * @param 获取所有下载的手机版本
+     */
+    getMobileModel(projectId) {
+        const sql = 'SELECT DISTINCT(a.mobileModel) FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId =' + projectId;
         return new ormModel().query(sql)
     }
 }

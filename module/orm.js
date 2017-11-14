@@ -16,8 +16,8 @@ class ormModel {
      * @param 同步数据库model事件
      */
 
-    creat(str) {
-        return db[str].create(...this.args);
+    creat(str) {                                 
+        return db[str].create(...this.args)
     }
 
     /**

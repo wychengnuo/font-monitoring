@@ -5,7 +5,7 @@ const { host } = require('./../config/default');
 const os = require('os');
 
 const networkInterfaces = os.networkInterfaces();
-const eth0 = (networkInterfaces.eth0 || networkInterfaces.en0).filter(i => i.family === 'IPv4');
+const eth0 = (networkInterfaces.eth0 || networkInterfaces.WLAN).filter(i => i.family === 'IPv4');
 
 /**
  * @param edit redis
