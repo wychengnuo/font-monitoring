@@ -26,6 +26,8 @@ class andirApiController {
 
         const { version, channl, systemVer, projectId } = ctx.query;
 
+        let projectId = 1;
+
         let data = await new editMysql().getPlugAnListInfoData(version, channl, systemVer, projectId);
 
         if (!data.length) {
