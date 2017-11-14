@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     
     User.associate = (models) => {
-        User.hasMany(models.role);
+        User.belongsTo(models.role);
     };
     return User;
 };

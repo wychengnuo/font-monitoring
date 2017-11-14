@@ -27,6 +27,9 @@ module.exports = function (sequelize, DataTypes) {
         // 将deletedAt字段改名
             'deletedAt': 'dtime'
         });
+    ErrorMessage.associate = (models) => {
+        ErrorMessage.belongsTo(models.projects);
+    };
     
     return ErrorMessage;
 };

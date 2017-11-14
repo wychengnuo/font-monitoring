@@ -19,7 +19,8 @@
         'jfVersion': '1.0.0',
         'openTime': t,
         'httpUrlBasic': '/plugin/api/setBasic',
-        'httpUrl': '/plugin/api/setHtmlError'
+        'httpUrl': '/plugin/api/setHtmlError',
+        'departmentId': 8
     };
 
     var _maq = window._maq || [];
@@ -62,9 +63,9 @@
     if (navigator) {
         packJSON.lang = navigator.language || '';
         packJSON.userAgent = navigator.userAgent || '',
-            packJSON.appVersion = navigator.appVersion || '',
-            packJSON.appName = navigator.appName || '',
-            packJSON.platform = navigator.platform || '';
+        packJSON.appVersion = navigator.appVersion || '',
+        packJSON.appName = navigator.appName || '',
+        packJSON.platform = navigator.platform || '';
     }
 
     /**
@@ -264,9 +265,7 @@
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200 || request.status == 304) { // readyState==4说明请求已完成                    
                     fn.call(this, request.responseText); //从服务器获得数据
-                    console.log('调用成功', url);
                 }
-                console.log('调用不成功，url地址不对或者服务有问题或者网络问题。', url);
             };
             request.send(null);
         },
@@ -277,9 +276,7 @@
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200 || request.status == 304) { // 304未修改
                     fn.call(this, request.responseText);
-                    console.log('调用成功', url);
                 }
-                console.log('调用不成功，url地址不对或者服务有问题或者网络问题。', url);
             };
             request.send(data);
         }
@@ -300,6 +297,7 @@
                 o[i] = obj[i];
             }
         }
+        o.departmentId = packJSON.departmentId;
         return o;
     }
 
@@ -338,7 +336,8 @@
         'lang': packJSON.lang,
         'sh': packJSON.sh,
         'sw': packJSON.sw,
-        'cd': packJSON.cd
+        'cd': packJSON.cd,
+        'departmentId': packJSON.departmentId
     };
     dataBody = JSON.stringify(dataBody);
     var dataErrorBody = JSON.stringify(localData);

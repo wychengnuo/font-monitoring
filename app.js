@@ -39,16 +39,13 @@ if (!fs.existsSync(baseUrl)) {
     }
 }
 
+require('./messQueue/index');
+
 /**
  * 下载文件
  */
 
-global.a = {};
-global.b = {};
-global.c = {};
-global.d = 0;
-global.e = {};
-global.f = 0;
+global.c = 1;
 
 app.use(async (ctx, next) => {
 
@@ -57,12 +54,6 @@ app.use(async (ctx, next) => {
      */
    
     if (ctx.originalUrl.indexOf('/public/download') == 0) {
-
-        if (!global.c[ctx.headers['channel']]) {
-            global.d = 0;
-        }
-
-        global.c[ctx.headers['channel']] = global.d+=1;
 
         try {
             const homeDir = decodeURIComponent(ctx.path);
@@ -74,7 +65,8 @@ app.use(async (ctx, next) => {
                 networkType : ctx.headers['network_type'] || '',
                 romInfo : ctx.headers['rom_info'] || '',
                 appVersion : ctx.headers['sver'] || '',
-                imei : ctx.headers['imei'] || ''
+                imei: ctx.headers['imei'] || '',
+                projectId: ctx.headers['projectId'] ? ctx.headers['projectId'] : (ctx.headers['projectid'] || '')
             }
 
             require('./utils/andirdownloads')(ctx, obj, homeDir, next);

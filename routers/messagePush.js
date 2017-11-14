@@ -21,12 +21,16 @@ class messagePush {
     static async addMessage(ctx, next) {
 
         let obj = ctx.request.body;
+        
 
         /**
          * 创建时间
          */
 
         obj.time = moment().format('YYYY-MM-DD HH:mm:ss');
+
+        const dt = await projectId(ctx);
+        obj.id = dt.id;
 
         new editMysql().messPush(obj);
 
@@ -43,7 +47,9 @@ class messagePush {
 
     static async getMessage(ctx, next) {
 
-        await paging(ctx, 'messPush');
+        let data = await projectId(ctx);
+
+        await paging(ctx, data.id);
         await next();
     }
 
@@ -55,7 +61,16 @@ class messagePush {
     
         const plant = ctx.query.plant;
 
-        let data = await new editMysql().getMessageByStatus(plant);
+        let project = await projectId(ctx);
+
+        if (!project) {
+            return ctx.body = {
+                success: true,
+                msg: '暂无数据'
+            }
+        }
+        
+        let data = await new editMysql().getMessageByStatus(plant, project.id);
         if (data && data.length > 0) {
             ctx.body = {
                 success: true,
@@ -78,6 +93,8 @@ class messagePush {
     static async setMessage(ctx, next) {
 
         const { num, id } = ctx.request.body;
+
+        let project = await projectId(ctx);
         
         let isEnable = {};
         
@@ -101,7 +118,7 @@ class messagePush {
 
         if (num == '1' || num == '2') {
             
-            await new editMysql().updateMessage(id, isEnable);
+            await new editMysql().updateMessage(id, isEnable, project.id);
             
             return ctx.body = {
                 success: true,
@@ -113,7 +130,7 @@ class messagePush {
              * 删除数据库字段
              */
 
-            new editMysql().deleteMessageId(id);
+            new editMysql().deleteMessageId(id, project.id);
             ctx.body = {
                 success: true,
                 msg: '删除成功'
@@ -125,17 +142,36 @@ class messagePush {
     }
 }
 
+/**
+ * @param 返回权限id
+ */
+
+const projectId = async (ctx) => {
+
+    let dt = false
+
+    if (!ctx.headers.cookie) {
+        return dt;
+    }
+    
+    const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+    
+    dt = await new editMysql().selectProjects(da.roleId);
+
+    return dt;
+}
+
 
 /**
  * 分页处理
  */
 
-const paging = async(ctx) => {
+const paging = async(ctx, id) => {
     
     let currentPage = ctx.query.page ? ctx.query.page : 1;
     let countPerPage = ctx.query.pageSize ? ctx.query.pageSize : 10;
     
-    let data = await new editMysql().messageFindAll(Number(currentPage), Number(countPerPage));
+    let data = await new editMysql().messageFindAll(Number(currentPage), Number(countPerPage), id);
     
     if (data.rows) {
         ctx.body = {

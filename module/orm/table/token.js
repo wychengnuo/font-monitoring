@@ -39,6 +39,7 @@ module.exports = function (sequelize, DataTypes) {
             // Using additional options like CASCADE etc for demonstration
             // Can also simply do Task.belongsTo(models.User);
         Token.belongsTo(models.user);
+        Token.belongsTo(models.role);
     };
     return Token;
 };

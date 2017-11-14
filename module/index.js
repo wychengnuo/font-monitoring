@@ -16,19 +16,51 @@ class editMysql {
     }
 
     /**
+     * @param 部门分类
+     */
+
+    roleSet(department) {
+        return new ormModel({ 'roleName': department }).creat('role');
+    }
+
+    /**
+     * @param 权限分类
+     */
+
+    projectsSet(id) {
+        new ormModel({ 'permissionsId': '1','roleId': id }).creat('projects');
+    }
+
+    /**
+     * @param 查看权限分类
+     */
+
+    selectProjects(id) {
+        return new ormModel().select('projects', { where: { roleId: id } });
+    }
+
+    /**
      * @param 登录方法操作
      */
 
-    userSet(name, nickname, password) {
-        return new ormModel({ 'username': name, 'nickname': nickname, 'password': password }).returnCreat('user');
+    userSet(name, nickname, password, roleId) {
+        return new ormModel({ 'username': name, 'nickname': nickname, 'password': password, 'roleId': roleId }).creat('user');
     }
 
     /**
      * @param 登录态方法操作
      */
 
-    tokenSet(token, id) {
-        new ormModel({ 'id': token, 'userId': id }).creat('token');
+    tokenSet(token, userId, roleId) {
+        new ormModel({ 'id': token, 'userId': userId, 'roleId': roleId }).creat('token');
+    }
+
+    /**
+     * @param 查看部门是否存在
+     */
+
+    selectRole(name) {
+        return new ormModel().select('role', { where: { roleName: name } });
     }
 
     /**
@@ -36,7 +68,7 @@ class editMysql {
      */
 
     selectUser(name) {
-        return new ormModel().selectUser('user', name);
+        return new ormModel().select('user', { where: { username: name } });
     }
 
     /**
@@ -44,7 +76,7 @@ class editMysql {
      */
 
     selectToken(token) {
-        return new ormModel().selectUserInfo('token', token);
+        return new ormModel().select('token', { where: { id: token } });
     }
 
     /**
@@ -52,7 +84,7 @@ class editMysql {
      */
     
     selectTokenIdUser(id) {
-        return new ormModel().selectUserInfo('user', id);
+        return new ormModel().select('user', { where: { id: id } });
     }
     
     /**
@@ -60,15 +92,15 @@ class editMysql {
      */
 
     userLayout(token) {
-        new ormModel().delete('token', token);
+        new ormModel().delete('token', { where: { id: token } });
     }
 
     /**
      * @param 返回浏览器account 
      */
 
-    getBrowerSet(account) {
-        return new ormModel().selectAccount('browser', account);
+    getBrowerSet(account, projectId) {
+        return new ormModel().select('browser', { where: { account: account, projectId: projectId} });
     }
 
     /**
@@ -77,22 +109,23 @@ class editMysql {
 
     browerSet(data) {
         new ormModel({
-            'account': data.account,
-            'jfVersion': data.jfVersion,
-            'openTime': data.openTime,
-            'source': data.source,
-            'userAgent': data.userAgent,
-            'appName': data.appName,
-            'platform': data.platform,
-            'appVersion': data.appVersion,
-            'domain': data.domain,
-            'localUrl': data.localUrl,
-            'title': data.title,
-            'referrer': data.referrer,
-            'lang': data.lang,
-            'sh': data.sh,
-            'sw': data.sh,
-            'cd': data.sh
+            account: data.account,
+            jfVersion: data.jfVersion,
+            openTime: data.openTime,
+            source: data.source,
+            userAgent: data.userAgent,
+            appName: data.appName,
+            platform: data.platform,
+            appVersion: data.appVersion,
+            domain: data.domain,
+            localUrl: data.localUrl,
+            title: data.title,
+            referrer: data.referrer,
+            lang: data.lang,
+            sh: data.sh,
+            sw: data.sh,
+            cd: data.sh,
+            projectId: data.id
         }).creat('browser');
     }
 
@@ -100,16 +133,16 @@ class editMysql {
      * @param getErrorMessageSet
      */
 
-    getErrorMessageSet() {
-        return new ormModel().query("select source, method, originalUrl, status, t, time from netErrorMessages where DATE_FORMAT(time, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
+    getErrorMessageSet(projectId) {
+        return new ormModel().query("select source, method, originalUrl, status, t, time from netErrorMessages where projectId=" + projectId + " and DATE_FORMAT(time, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
     }
 
     /**
      * @param getErrorMessageCount
      */
 
-    getErrorMessageCount() {
-        return new ormModel().query("SELECT type, DATE_FORMAT(sTime, '%Y-%m-%d') AS sTime, count(*) AS count FROM `errorMessages` AS `errorMessage` where DATE_FORMAT(sTime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d') GROUP BY DATE_FORMAT(sTime, '%Y-%m-%d') ,type ORDER BY type, DATE_FORMAT(sTime, '%Y-%m-%d') asc");
+    getErrorMessageCount(projectId) {
+        return new ormModel().query("SELECT type, DATE_FORMAT(sTime, '%Y-%m-%d') AS sTime, count(*) AS count FROM `errorMessages` AS `errorMessage` where projectId = " + projectId + " and DATE_FORMAT(sTime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d') GROUP BY DATE_FORMAT(sTime, '%Y-%m-%d') ,type ORDER BY type, DATE_FORMAT(sTime, '%Y-%m-%d') asc");
     }
 
     /**
@@ -130,14 +163,15 @@ class editMysql {
         msg = msg.toString();
         oArr = oArr.toString();
         new ormModel({
-            'type': data.type,
-            'sMsg': msg || data.sMsg,
-            'sUrl': data.sUrl,
-            'sLine': data.sLine,
-            'sColu': data.sColu,
-            'eObj': oArr || data.eObj,
-            'sTime': data.sTime,
-            'browerType': data.browerType
+            type: data.type,
+            sMsg: msg || data.sMsg,
+            sUrl: data.sUrl,
+            sLine: data.sLine,
+            sColu: data.sColu,
+            eObj: oArr || data.eObj,
+            sTime: data.sTime,
+            browerType: data.browerType,
+            projectId: data.id
         }).creat('errorMessage');
     }
 
@@ -147,13 +181,14 @@ class editMysql {
 
     netMessageSet(data) {
         new ormModel({
-            'source': data.source,
-            'method': data.method,
-            'originalUrl': data.originalUrl,
-            'status': data.status,
-            't': data.t,
-            'time': data.time,
-            'msg': data.msg
+            source: data.source||'management',
+            method: data.method,
+            originalUrl: data.originalUrl,
+            status: data.status,
+            t: data.t,
+            time: data.time,
+            msg: data.msg,
+            projectId: data.id
         }).creat('netErrorMessage');
     }
 
@@ -161,8 +196,8 @@ class editMysql {
      * @param 分页查看message
      */
 
-    messageFindAll(currentPage, countPerPage) {
-        return new ormModel().findAndCountAll('messPush', currentPage, countPerPage);
+    messageFindAll(currentPage, countPerPage, projectId) {
+        return new ormModel().findAndCountAll('messPush', { where: { projectId: projectId }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
     }
 
     /**
@@ -175,7 +210,9 @@ class editMysql {
             content: data.content,
             isEnable: data.isEnable,
             time: data.time,
-            uerTypes: data.uerTypes
+            uerTypes: data.uerTypes,
+            projectId: data.id,
+            plant: data.plant
         }).creat('messPush');
     }
 
@@ -183,16 +220,16 @@ class editMysql {
      * @param 获取所有安卓插件项目
      */
 
-    getPlugAnAll() {
-        return new ormModel().findAll('plugAn');
+    getPlugAnAll(projectId) {
+        return new ormModel().findAll('plugAn', { where: { projectId: projectId } });
     }
 
     /**
      * @param andir 插件项目查询
      */
 
-    getPlugAn(name) {
-        return new ormModel().select('plugAn', name);
+    getPlugAn(name, projectId) {
+        return new ormModel().select('plugAn', { where: { name: name, projectId: projectId } });
     }
 
     /**
@@ -203,37 +240,39 @@ class editMysql {
         return new ormModel({
             name: data.account,
             version: data.version,
-            time: data.time
-        }).returnCreat('plugAn');
+            time: data.time,
+            projectId: data.id
+        }).creat('plugAn');
     }
 
     /**
      * @param andir 插件列表id
      */
     
-    getPlugAnListId(name) {
-        return new ormModel().selectPlugAnListInfoId('plugAnList', name);
+    getPlugAnListId(name, projectId) {
+        return new ormModel().select('plugAnList', { where: { plugListName: name, projectId: projectId } });
     }
 
     /**
      * @param 查询所有插件列表
      */
 
-    getPlugFindAndCountAll(id) {
-        return new ormModel().plugFindAndCountAll('plugAnList', id);
+    getPlugFindAndCountAll(plugAnId, projectId) {
+        return new ormModel().findAll('plugAnList', { where: { plugAnId: plugAnId, projectId: projectId } });
     }
 
     /**
      * @param andir 插件列表
      */
     
-    plugAnList(data, id) {
+    plugAnList(data) {
         new ormModel({
             plugListName: data.plugName,
             describe: data.describe,
             category: data.category,
             time: data.time,
-            plugAnId: id
+            plugAnId: data.plugAnId,
+            projectId: data.id
         }).creat('plugAnList');
     }
 
@@ -241,87 +280,79 @@ class editMysql {
      * @param 删除插件数据
      */
     
-    deletePlugAnList(id) {
-        return new ormModel().deletePlugAnList('plugAnList', id);
+    deletePlugAnList(id, projectId) {
+        return new ormModel().delete('plugAnList', { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param andir 插件列表id
      */
 
-    getPlugAnListInfoId(where) {
-        return new ormModel().getDataForOne('plugAnListInfo', where);
+    getPlugAnListInfoId(name, version, projectId) {
+        return new ormModel().select('plugAnListInfo', { where: { name: name, plugVersion: version, projectId: projectId } });
     }
 
-    /**
-     * @param andir 设置插件列表id
-     */
-
-    getPlugAnListInfoIds(name) {
-        return new ormModel().selectPlugAnListInfoIds('plugAnListInfo', name);
-    }
-    
     /**
      * @param 根据插件列表id，查询其所有列表详情插件
      */
 
     getPlugAnListInfoAll(id) {
-        return new ormModel().getPlugAnListInfoIdAll('plugAnListInfo', id);
+        return new ormModel().findAll('plugAnListInfo', { where: { plugAnListId: id, projectId: projectId } });
     }
 
      /**
      * @param 设置插件版本插件的状态
      */
 
-    updatePlugAnListId(id, isEnable) {
-        new ormModel().setPlugupdate('plugAnListInfo', id, isEnable.isEnable);
+    updatePlugAnListId(id, isEnable, projectId) {
+        new ormModel().update('plugAnListInfo', { isEnable: isEnable.isEnable }, { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param 设置长连接信息状态
      */
 
-    updateMessage(id, isEnable) {
-        new ormModel().setMessageupdate('messPush', id, isEnable.isEnable);
+    updateMessage(id, isEnable, projectId) {
+        new ormModel().update('messPush', { isEnable: isEnable.isEnable }, { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param 根据id删除插件数据
      */
 
-    deletePlugAnListId(id) {
-        new ormModel().delPlugAnListInfo('plugAnListInfo', id);
+    deletePlugAnListId(id, projectId) {
+        new ormModel().delete('plugAnListInfo', { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param 根据id删除下载量统计
      */
 
-    deletePlugDownId(id) {
-        new ormModel().delPlugAnListInfo('plugDown', id);
+    deletePlugDownId(id, projectId) {
+        new ormModel().delete('plugDown', { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param 根据id删除长连接信息
      */
 
-    deleteMessageId(id) {
-        new ormModel().delPlugAnListInfo('messPush', id);
+    deleteMessageId(id, projectId) {
+        new ormModel().delete('messPush', { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param 根据plugAnId 删除插件数据
      */
 
-    deletePlugAnId(id) {
-        new ormModel().deletePlugAnListId('plugAnListInfo', id);
+    deletePlugAnId(id, projectId) {
+        new ormModel().delete('plugAnListInfo', { where: { id: id, projectId: projectId } });
     }
 
     /**
      * @param andir 插件列表版本
      */
   
-    plugAnListInfo(data, id) {
+    plugAnListInfo(data) {
         new ormModel({
             channl: data.channl,
             fileSize: data.fileSize,
@@ -335,7 +366,8 @@ class editMysql {
             textarea: data.textarea,
             time: data.time,
             version: data.version,
-            plugAnListId: id
+            plugAnListId: data.plugAnListId,
+            projectId: data.id
         }).creat('plugAnListInfo');
     }
 
@@ -343,15 +375,15 @@ class editMysql {
      * @param 下载量累加
      */
 
-    getPlugDownId(where) {
-        return new ormModel().getDataForOne('plugDown', where);
+    getPlugDownId(channl, obj) {
+        return new ormModel().findAll('plugDown', { where: { name: channl, plugAnListInfoId: obj.id, projectId: obj.projectId } });
     }
 
     /**
      * @param 插件下载量统计
      */
 
-    async plugDown(data, id) {
+    async plugDown(data, obj) {
         new ormModel({
             name: data.channel,
             sum: 1,
@@ -361,7 +393,8 @@ class editMysql {
             romInfo: data.romInfo,
             appVersion: data.appVersion,
             imei: data.imei,
-            plugAnListInfoId: id
+            plugAnListInfoId: obj.id,
+            projectId: obj.projectId
         }).creat('plugDown');
     }
 
@@ -369,27 +402,27 @@ class editMysql {
      * @param 更新下载量id
      */
 
-    updatePlugDownId(data, a) {
-        return new ormModel().update('plugDown', data.sum + a, data.name);
+    updatePlugDownId(name, sum, projectId) {
+        return new ormModel().update('plugDown', { sum: sum}, { where: { name: name, projectId: projectId } });  
     }
 
 	/**
      * 获取一周内下载量
      * @returns {*}
      */
-    getPlugDownLoads() {
-        return new ormModel().query("select name, DATE_FORMAT(utime, '%Y-%m-%d') as time, sum from plugDowns where DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
+    getPlugDownLoads(projectId) {
+        return new ormModel().query("select name, DATE_FORMAT(utime, '%Y-%m-%d') as time, sum from plugDowns where projectId = " + projectId + " and DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
     }
 
     /**
      * @param 分页查看
      */
 
-    getFindAllData(str, currentPage, countPerPage, id) {
-        if (id) {
-            return new ormModel().idFindAndCountAll(str, currentPage, countPerPage, id);
+    getFindAllData(str, currentPage, countPerPage, projectId, plugAnListId) {
+        if (plugAnListId) {
+            return new ormModel().findAndCountAll(str, { where: { projectId: projectId, plugAnListId: plugAnListId }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
         } else {
-            return new ormModel().findAndCountAll(str, currentPage, countPerPage);
+            return new ormModel().findAndCountAll(str, { where: { projectId: projectId }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
         }
     }
 
@@ -397,18 +430,17 @@ class editMysql {
      * @param 插件下载对外地址
      */
 
-    getPlugAnListInfoData(version, channl, systemVer) {
-        return new ormModel().plugPlugAnInfo('plugAnListInfo', version, channl, systemVer);
+    getPlugAnListInfoData(version, channl, systemVer, projectId) {
+        return new ormModel().findAll('plugAnListInfo', { where: { channl, version, systemVer, projectId } });
     }
-
 
 	/**
      * 根据状态和平台获取数据
      * @param plant
      * @returns {*}
      */
-    getMessageByStatus(plant) {
-        return new ormModel().query('select content from messPushes where isEnable = TRUE and plant like "%' + plant + '%"');
+    getMessageByStatus(plant, projectId) {
+        return new ormModel().query('select content from messPushes where projectId = ' + projectId +' and isEnable = TRUE and plant like "%' + plant + '%"');
     }
 
 	/**
@@ -417,8 +449,8 @@ class editMysql {
      * @param where
      * @returns {*}
      */
-    getData(str, where) {
-        return new ormModel().getData(str, where);
+    getData(str, projectId) {
+        return new ormModel().findAll(str, { where: { id: id, projectId: projectId } });
     }
 
     /**
@@ -430,9 +462,9 @@ class editMysql {
      * @param plugVersion
      * @returns {*}
 	 */
-    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, isCount) {
-        let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id ', str = '';
-        let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id ';
+    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, projectId, isCount) {
+        let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId, str = '';
+        let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId;
 
         if (plugChannel != '') {
             if (str !== '') {
@@ -475,8 +507,8 @@ class editMysql {
      * 获取所有的插件下载渠道
      * @returns {*}
      */
-    getPlugChannelList() {
-        const sql = 'SELECT DISTINCT(name) AS channel from plugDowns';
+    getPlugChannelList(projectId) {
+        const sql = 'SELECT DISTINCT(name) AS channel from plugDowns where projectId = ' + projectId;
         return new ormModel().query(sql)
     }
 
@@ -484,8 +516,8 @@ class editMysql {
      * 获取所有的插件下载的名称
      * @returns {*}
      */
-    getPlugNamelList() {
-        const sql = 'SELECT DISTINCT(b.name) AS name FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id';
+    getPlugNamelList(projectId) {
+        const sql = 'SELECT DISTINCT(b.name) AS name FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = +' + projectId;
         return new ormModel().query(sql)
     }
 
@@ -493,8 +525,8 @@ class editMysql {
      * 获取所有的插件下载的版本
      * @returns {*}
      */
-    getPlugVersionlList() {
-        const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id';
+    getPlugVersionlList(projectId) {
+        const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId =' + projectId;
         return new ormModel().query(sql)
     }
 }

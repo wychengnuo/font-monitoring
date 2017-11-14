@@ -1,9 +1,8 @@
 
 /**
- * @param rom 通过次类对数据库进行操作
+ * @param orm 数据库操作方法
  */
 
-// const redis = require('./../server/redis');
 const db = require('./orm/concat.js');
 const { sequelize } = require('./orm/index');
 
@@ -14,148 +13,55 @@ class ormModel {
     }
 
     /**
-     * @param 增加数据方法
+     * @param 同步数据库model事件
      */
 
-    returnCreat(str) {
+    creat(str) {
         return db[str].create(...this.args);
     }
 
-    creat(str) {
-        db[str].create(...this.args);
-    }
-
     /**
-     * @param 查询方法
+     * @param 数据查询方法
      */
 
-    select(str, name) {
-        return db[str].findOne({ where: { name } });
+    select(str, where) {
+        return db[str].findOne(where);
     }
 
     /**
-     *@param 查询user信息
+     * @param 数据库更新方法
      */
 
-    selectUser(str, username) {
-        return db[str].findOne({ where: { username } });
+    update(str, where, where1) { 
+        return db[str].update(where, where1);
     }
-
+  
     /**
-     * 
-     * @param 1对1查询
+     * @param 数据库删除方法
      */
 
-    selectUserInfo(str, id) {
-        return db[str].findOne({ where: { id } });
+    delete(str, where) {
+        db[str].destroy(where);
     }
 
     /**
-     * @param 查询account
+     * @param 数据库查看分页方法
      */
 
-    selectAccount(str, account) {
-        return db[str].findOne({ where: { account } });
+    findAndCountAll(str, where) {
+        return db[str].findAndCountAll(where);
     }
 
     /**
-     * @param 查询插件列表id
+     * @param 数据库不分页查询方法
      */
 
-    selectPlugAnListInfoId(str, plugListName) {
-        return db[str].findOne({ where: { plugListName } });
+    findAll(str, where) {
+        return db[str].findAll(where);
     }
 
     /**
-     * @param 查找设置插件列表id
-     */
-
-    selectPlugAnListInfoIds(str, plugName) {
-        return db[str].findOne({ where: { plugName: { '$like': '%' + plugName} } });
-    }
-
-    /**
-     * @param 更新插件版本详细信息状态
-     */
-
-    setPlugupdate(str, id, isEnable) {
-        db[str].update({ isEnable: isEnable }, { where: { id: id } });
-    }
-
-    /**
-     * @param 更新长连接信息状态
-     */
-
-    setMessageupdate(str, id, isEnable) { 
-        db[str].update({ isEnable: isEnable }, { where: { id } });
-    }
-
-    /**
-     * @param 删除插件数据
-     */
-
-    delPlugAnListInfo(str, id) { 
-        db[str].destroy({ where: { id: id } });
-    }
-
-    /**
-     * @param 更新插件下载量
-     */
-
-    update(str, sum, name) { 
-        return db[str].update({ sum: sum }, { where: { name } });
-    }
-    
-    /**
-     * @param 删除数据方法
-     */
-
-    delete(str, token) {
-        db[str].destroy({ where: { id: token } });
-    }
-
-    /**
-     * @param 根据name删除插件列表
-     */
-
-    deletePlugAnList(str, id) {
-        db[str].destroy({ where: { id: id } });
-    }
-
-    /**
-     * @param 根据plugAnListId删除插件列表
-     */
-
-    deletePlugAnListId(str, id) {
-        db[str].destroy({ where: { plugAnListId: id } });
-    }
-
-    /**
-     * @param 查看分页数据
-     */
-
-    findAndCountAll(str, currentPage, countPerPage) {
-            return db[str].findAndCountAll({'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
-    }
-
-    /**
-     * @param 根据id分页数据
-     */
-
-    idFindAndCountAll(str, currentPage, countPerPage, id) {
-        return db[str].findAndCountAll({where: { plugAnListId: id }, 'limit': countPerPage, 'offset': countPerPage * (currentPage - 1) });
-    }
-
-    /**
-     * @param 查看所有数据
-     */
-
-    findAll(str) {
-        return db[str].findAll();
-    }
-
-    /**
-     * @param 查看所有数据
+     * @param 数据库不分页查询方法 sql
      */
 
     query(sql) {
@@ -164,59 +70,18 @@ class ormModel {
         })
     }
     
-    /**
-     * @param 联合查询插件版本
-     */
-
-    plugFindAndCountAll(str, plugAnId) {
-        return db[str].findAll({ where: { plugAnId } });
-    }
-
-    /**
-     * @param 查询插件版本详细信息
-     */
-    getPlugAnListInfoIdAll(str, plugAnListId) {
-        return db[str].findAll({ where: { plugAnListId } });
-    }
-
-    /**
-     * @param 插件对外下载接口
-     */
-
-    plugPlugAnInfo(str, version, channl, systemVer) {
-        return db[str].findAll({ where: { channl, version, systemVer } });
-    }
-
 	/**
      *
      * @param str
      * @param where
      * @returns {*|Promise.<Array.<Model>>}
      */
+    
     findData(str, where) {
         // return db[str].findAll({ where: where });
         return db[str].getCount('select count(*) from messPushes where isEnable = TRUE');
     }
 
-	/**
-     * 根据where条件查询数据
-     * @param str
-     * @param where
-     * @returns {*|Promise.<Array.<Model>>}
-     */
-    getData(str, where) {
-        return db[str].findAll({ where: where });
-    }
-
-	/**
-     * 根据where条件查询数据
-     * @param str
-     * @param where
-     * @returns {Promise.<Model>}
-     */
-    getDataForOne(str, where) {
-        return db[str].findOne({ where: where });
-    }
 }
 
 module.exports = ormModel;
