@@ -296,7 +296,7 @@ class editMysql {
      * @param 根据插件列表id，查询其所有列表详情插件
      */
 
-    getPlugAnListInfoAll(id) {
+    getPlugAnListInfoAll(id, projectId) {
         return new ormModel().findAll('plugAnListInfo', { where: { plugAnListId: id, projectId: projectId } });
     }
 
