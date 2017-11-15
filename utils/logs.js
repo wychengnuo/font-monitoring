@@ -42,7 +42,10 @@ const loggers = async (ctx, start, err) => {
                     msg: '无数据'
             }
         }
-        const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+
+        const token = require('./../utils/getToken')(ctx)
+
+        const da = await new editMysql().selectToken(token)
         const dt = await new editMysql().selectProjects(da.roleId);
         o.id = dt.id;
         new editMysql().netMessageSet(o);
