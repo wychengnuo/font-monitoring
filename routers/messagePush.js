@@ -153,8 +153,9 @@ const projectId = async (ctx) => {
     if (!ctx.headers.cookie) {
         return dt;
     }
+    const token = require('./../utils/getToken')(ctx)
     
-    const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+    const da = await new editMysql().selectToken(token)
     
     dt = await new editMysql().selectProjects(da.roleId);
 

@@ -732,7 +732,9 @@ class ApiController {
 
 const projectId = async(ctx) => {
 
-    const da = await new editMysql().selectToken(ctx.headers.cookie.split('=')[1])
+    const token = require('./../utils/getToken')(ctx)
+
+    const da = await new editMysql().selectToken(token)
 
     const dt = await new editMysql().selectProjects(da.roleId);
 
