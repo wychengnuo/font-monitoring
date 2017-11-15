@@ -414,7 +414,7 @@ class editMysql {
      * @returns {*}
      */
     getPlugDownLoads(projectId) {
-        return new ormModel().query("select name, SUM(sum) as sum, DATE_FORMAT(utime, '%Y-%m-%d') as time, mobileModel from plugDowns where projectId = " + projectId + " and DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d') group by mobileModel, name, DATE_FORMAT(utime, '%Y-%m-%d')");
+        return new ormModel().query("select name, SUM(sum) as sum, DATE_FORMAT(utime, '%Y-%m-%d') as time from plugDowns where projectId = " + projectId + " and DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d') group by name, DATE_FORMAT(utime, '%Y-%m-%d')");
     }
 
     /**
