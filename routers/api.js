@@ -9,8 +9,6 @@ const path = require('path');
 
 const editMysql = require('./../module/index');
 
-const client = require('./../server/redis');
-
 /**
  * @param 接口暂时统一处理
  */
@@ -596,7 +594,6 @@ class ApiController {
         let arr, obj = {},
             pieArray = [];
         
-        
         data.map(async (v) => {
             arr = [];
             for (let j = 6; j >= 0; j--) {
@@ -605,9 +602,9 @@ class ApiController {
                     count = 0;
                 
                 if (date == v.time) {
-                    count = v.sum + sumb;
-                } else if (obj[v.name] && obj[v.name][6 - j] !== 0) {
-                    count = obj[v.name][6 - j];
+                    count = v.sum;
+                } else if (obj[v.mobileModel] && obj[v.mobileModel][6 - j] !== 0) {
+                    count = obj[v.mobileModel][6 - j];
                 }
                 
                 arr.push(count);
@@ -617,25 +614,33 @@ class ApiController {
 
         if (data && data.length > 0) {
 
-            data.reduce(async (pre, cur, index, arr) => {
-                if (pre.name === cur.name) {
-                    cur.sum = pre.sum + cur.sum;
-                } else {
-                    pieArray.push({
-                        value: pre.sum,
-                        name: pre.name
-                    });
-                }
+            if (data.length !== 1) {
 
-                if (index === arr.length - 1) {
-                    pieArray.push({
-                        value: cur.sum,
-                        name: cur.name
-                    });
-                }
-                return cur;
-            })
+                data.reduce((pre, cur, index, arr) => {
+                    if (pre.name === cur.name) {
+                        cur.sum = parseInt(pre.sum) + parseInt(cur.sum);
+                    } else {
+                        pieArray.push({
+                            value: pre.sum,
+                            name: pre.name
+                        });
+                    }
 
+                    if (index === arr.length - 1) {
+                        pieArray.push({
+                            value: cur.sum,
+                            name: cur.name
+                        });
+                    }
+                    return cur;
+                })
+            } else {
+                pieArray.push({
+                    value: data[0].sum,
+                    name: data[0].mobileModel
+                });
+            }
+            
             obj['pieData'] = pieArray;
 
             ctx.body = {
@@ -646,9 +651,9 @@ class ApiController {
         } else {
             ctx.body = {
                 success: false,
-                data: {},
-                msg: '失败'
-            };
+                data: null,
+                msg: '暂无数据'
+            }
         }
 
         await next();
@@ -660,11 +665,13 @@ class ApiController {
         let channelList = await new editMysql().getPlugChannelList(project.id);
         let nameList = await new editMysql().getPlugNamelList(project.id);
         let versionList = await new editMysql().getPlugVersionlList(project.id);
+        let modelList = await new editMysql().getMobileModel(project.id);
 
         let data = {
             channelList: channelList || [],
             nameList: nameList || [],
-            versionList: versionList || []
+            versionList: versionList || [],
+            modelList: modelList || []
         }
 
         ctx.body = {
@@ -686,11 +693,12 @@ class ApiController {
         let plugChannel = ctx.query.channel || '';
         let plugName = ctx.query.name || '';
         let plugVersion = ctx.query.version || '';
+        let mobileModel = ctx.query.mobileModel || '';
 
         let data = await new editMysql().getPlugDownList(Number(currentPage), Number(countPerPage), plugChannel,
-            plugName, plugVersion, project.id);
+            plugName, plugVersion, mobileModel, project.id);
         let obj = await new editMysql().getPlugDownList(Number(currentPage), Number(countPerPage), plugChannel,
-            plugName, plugVersion, project.id, true);
+            plugName, plugVersion, mobileModel, project.id, true);
 
         if (obj.length > 0 && obj[0].count > 0) {
             ctx.body = {

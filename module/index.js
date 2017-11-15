@@ -384,18 +384,21 @@ class editMysql {
      */
 
     async plugDown(data, obj) {
-        new ormModel({
-            name: data.channel,
+
+        const model = data.map(v => ({
+            name: v.channel,
             sum: 1,
-            mobileModel: data.mobileModel,
-            mobileVersion: data.mobileVersion,
-            networkType: data.networkType,
-            romInfo: data.romInfo,
-            appVersion: data.appVersion,
-            imei: data.imei,
-            plugAnListInfoId: obj.id,
-            projectId: obj.projectId
-        }).creat('plugDown');
+            mobileModel: v.mobileModel,
+            mobileVersion: v.mobileVersion,
+            networkType: v.networkType,
+            romInfo: v.romInfo,
+            appVersion: v.appVersion,
+            imei: v.imei,
+            plugAnListInfoId: obj && obj.id || 1,
+            projectId: obj && obj.projectId || 2
+        }));
+
+        return new ormModel(model).bulkCreate('plugDown');
     }
 
     /**
@@ -411,7 +414,7 @@ class editMysql {
      * @returns {*}
      */
     getPlugDownLoads(projectId) {
-        return new ormModel().query("select name, DATE_FORMAT(utime, '%Y-%m-%d') as time, sum from plugDowns where projectId = " + projectId + " and DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d')");
+        return new ormModel().query("select name, SUM(sum) as sum, DATE_FORMAT(utime, '%Y-%m-%d') as time from plugDowns where projectId = " + projectId + " and DATE_FORMAT(utime, '%Y-%m-%d') >=  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 DAY), '%Y-%m-%d') group by name, DATE_FORMAT(utime, '%Y-%m-%d')");
     }
 
     /**
@@ -462,29 +465,36 @@ class editMysql {
      * @param plugVersion
      * @returns {*}
 	 */
-    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, projectId, isCount) {
-        let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId, str = '';
-        let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = ' + projectId;
+    getPlugDownList(currentPage, pageSize, plugChannel, plugName, plugVersion, mobileModel, projectId, isCount) {
+        let sql = 'SELECT a.*, b.name AS plugName, b.plugVersion FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id', str = '';
+        let sqlCount = 'SELECT count(*) AS count FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id';
 
         if (plugChannel != '') {
             if (str !== '') {
                 str += ' AND ';
             }
-            str = str + 'a.name = "' + plugChannel + '"';
+            str = str + 'a.name = ' + '"' + plugChannel + '"' + ' and a.projectId = ' + projectId;
         }
 
         if (plugName != '') {
             if (str !== '') {
                 str += ' AND ';
             }
-            str = str + 'b.name = "' + plugName + '"';
+            str = str + 'b.name = ' + '"' + plugName + '"' + ' and a.projectId = ' + projectId;
         }
 
         if (plugVersion != '') {
             if (str !== '') {
                 str += ' AND ';
             }
-            str = str + 'b.plugVersion = "' + plugVersion + '"';
+            str = str + 'b.plugVersion = ' + '"' + plugVersion + '"' + ' and a.projectId = ' + projectId;
+        }
+
+        if(mobileModel != '') {
+            if(str !== '') {
+                str += ' AND ';
+            }
+            str = str + 'a.mobileModel = ' + '"' + mobileModel + '"' + ' and a.projectId = ' + projectId;
         }
 
         if (str !== '') {
@@ -497,7 +507,7 @@ class editMysql {
         } else {
             sql += str;
             if (currentPage && pageSize) {
-                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + currentPage * pageSize;
+                sql = sql + ' limit ' + (currentPage - 1) * pageSize + ', ' + pageSize;
             }
             return new ormModel().query(sql);
         }
@@ -517,7 +527,7 @@ class editMysql {
      * @returns {*}
      */
     getPlugNamelList(projectId) {
-        const sql = 'SELECT DISTINCT(b.name) AS name FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId = +' + projectId;
+        const sql = 'SELECT DISTINCT(b.name) AS name FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id where a.projectId = +' + projectId;
         return new ormModel().query(sql)
     }
 
@@ -526,7 +536,15 @@ class editMysql {
      * @returns {*}
      */
     getPlugVersionlList(projectId) {
-        const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id and b.projectId =' + projectId;
+        const sql = 'SELECT DISTINCT(b.plugVersion) AS version FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id where a.projectId =' + projectId;
+        return new ormModel().query(sql)
+    }
+
+    /**
+     * @param 获取所有下载的手机版本
+     */
+    getMobileModel(projectId) {
+        const sql = 'SELECT DISTINCT(a.mobileModel) FROM plugDowns a LEFT JOIN plugAnListInfos b ON a.plugAnListInfoId = b.id where a.projectId =' + projectId;
         return new ormModel().query(sql)
     }
 }
