@@ -594,7 +594,6 @@ class ApiController {
         let arr, obj = {},
             pieArray = [];
         
-        
         data.map(async (v) => {
             arr = [];
             for (let j = 6; j >= 0; j--) {
@@ -603,9 +602,9 @@ class ApiController {
                     count = 0;
                 
                 if (date == v.time) {
-                    count = v.sum + sumb;
-                } else if (obj[v.name] && obj[v.name][6 - j] !== 0) {
-                    count = obj[v.name][6 - j];
+                    count = v.sum;
+                } else if (obj[v.mobileModel] && obj[v.mobileModel][6 - j] !== 0) {
+                    count = obj[v.mobileModel][6 - j];
                 }
                 
                 arr.push(count);
@@ -615,25 +614,33 @@ class ApiController {
 
         if (data && data.length > 0) {
 
-            data.reduce(async (pre, cur, index, arr) => {
-                if (pre.name === cur.name) {
-                    cur.sum = pre.sum + cur.sum;
-                } else {
-                    pieArray.push({
-                        value: pre.sum,
-                        name: pre.name
-                    });
-                }
+            if (data.length !== 1) {
 
-                if (index === arr.length - 1) {
-                    pieArray.push({
-                        value: cur.sum,
-                        name: cur.name
-                    });
-                }
-                return cur;
-            })
+                data.reduce((pre, cur, index, arr) => {
+                    if (pre.name === cur.name) {
+                        cur.sum = parseInt(pre.sum) + parseInt(cur.sum);
+                    } else {
+                        pieArray.push({
+                            value: pre.sum,
+                            name: pre.name
+                        });
+                    }
 
+                    if (index === arr.length - 1) {
+                        pieArray.push({
+                            value: cur.sum,
+                            name: cur.name
+                        });
+                    }
+                    return cur;
+                })
+            } else {
+                pieArray.push({
+                    value: data[0].sum,
+                    name: data[0].mobileModel
+                });
+            }
+            
             obj['pieData'] = pieArray;
 
             ctx.body = {
@@ -644,9 +651,9 @@ class ApiController {
         } else {
             ctx.body = {
                 success: false,
-                data: {},
-                msg: '失败'
-            };
+                data: null,
+                msg: '暂无数据'
+            }
         }
 
         await next();
