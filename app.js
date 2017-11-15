@@ -4,9 +4,9 @@ const app = new Koa();
 const path = require('path');
 const cors = require('koa-cors');
 const koaBody = require('koa-body');
+// const eventproxy = require('eventproxy');
 
 const getInterface = require('./utils/logs');
-const existenceTime = require('./server/existenceTime');
 const { corn } = require('./config/default');
 
 app.use(cors());
@@ -24,21 +24,8 @@ const apiRouter = require('./routers/router');
 app.use(apiRouter.routes())
     .use(apiRouter.allowedMethods());
 
-const redis = require('./server/redis');
-
 app
-    .use(getInterface())
-    .use(existenceTime(redis));
-/**
- *  redis 监控启动
- */
-
-redis.on('error', function (err) {
-    console.log('\n哈喽：\n亲爱的小伙。\n请启动redis！！！\n');
-    redis.disconnect();
-    console.log(err);
-    throw err;
-});
+    .use(getInterface());
 
 const fs = require('fs');
 
@@ -52,23 +39,38 @@ if (!fs.existsSync(baseUrl)) {
     }
 }
 
+require('./messQueue/index');
+
 /**
  * 下载文件
  */
+
+global.c = 1;
 
 app.use(async (ctx, next) => {
 
     /**
      * 兼容api不走下载
      */
-
-    if (ctx.originalUrl.indexOf('api') == -1) {
+   
+    if (ctx.originalUrl.indexOf('/public/download') == 0 && ctx.method === 'GET') {
 
         try {
             const homeDir = decodeURIComponent(ctx.path);
             let filePath = path.join(__dirname, homeDir);
-            const channl = ctx.headers['channel_code'];
-            require('./utils/andirdownloads')(channl, next);
+            let obj = {
+                channel : ctx.headers['channel'],
+                mobileModel : ctx.headers['mobile_model'] || '',
+                mobileVersion : ctx.headers['os_version'] || '',
+                networkType : ctx.headers['network_type'] || '',
+                romInfo : ctx.headers['rom_info'] || '',
+                appVersion : ctx.headers['sver'] || '',
+                imei: ctx.headers['imei'] || '',
+                projectId: ctx.headers['projectId'] ? ctx.headers['projectId'] : (ctx.headers['projectid'] || 1)
+            }
+
+            require('./utils/andirdownloads')(ctx, obj, homeDir, next);
+            
             ctx.response.attachment(filePath);
 
         } catch (error) {
@@ -101,8 +103,8 @@ require('./utils/socket')(server);
 /**
  * 定时任务执行
  */
-const cronJob = require('cron').CronJob;
+// const cronJob = require('cron').CronJob;
 
-new cronJob(corn.time, function () {  
-    require('./logs/errLog')(); 
-}, null, true, 'Asia/Chongqing');  
+// new cronJob(corn.time, function () {  
+//     require('./logs/errLog')(); 
+// }, null, true, 'Asia/Chongqing');  

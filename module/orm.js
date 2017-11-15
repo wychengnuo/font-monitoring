@@ -1,9 +1,10 @@
 
 /**
- * @param rom 通过次类对数据库进行操作
+ * @param orm 数据库操作方法
  */
 
-const redis = require('./../server/redis');
+const db = require('./orm/concat.js');
+const { sequelize } = require('./orm/index');
 
 class ormModel {
 
@@ -12,131 +13,81 @@ class ormModel {
     }
 
     /**
-     * @param loginSet  登录存储操作
+     * @param 同步数据库model事件
      */
 
-    set() {
-        redis.set(...this.args);
+    creat(str) {                                 
+        return db[str].create(...this.args)
     }
 
     /**
-     * @param 下载量统计 存储操作
+     * @param 同步数据model事件，同时创建多条记录
+     */
+
+    bulkCreate(str) {
+        return db[str].bulkCreate(...this.args);
+    }
+
+    /**
+     * @param 数据查询方法
+     */
+
+    select(str, where) {
+        return db[str].findOne(where);
+    }
+
+    /**
+     * @param 数据库更新方法
+     */
+
+    update(str, where, where1) { 
+        return db[str].update(where, where1);
+    }
+  
+    /**
+     * @param 数据库删除方法
+     */
+
+    delete(str, where) {
+        db[str].destroy(where);
+    }
+
+    /**
+     * @param 数据库查看分页方法
+     */
+
+    findAndCountAll(str, where) {
+        return db[str].findAndCountAll(where);
+    }
+
+    /**
+     * @param 数据库不分页查询方法
+     */
+
+    findAll(str, where) {
+        return db[str].findAll(where);
+    }
+
+    /**
+     * @param 数据库不分页查询方法 sql
+     */
+
+    query(sql) {
+        return sequelize.query(sql).spread(function (results, metadata) {
+            return metadata;
+        })
+    }
+    
+	/**
+     *
+     * @param str
+     * @param where
+     * @returns {*|Promise.<Array.<Model>>}
      */
     
-    downSet() {
-        redis.set(...this.args);
-    }
-
-    /**
-     * @param 下载量统计++ 自增id
-     */
-    
-    downIncr() {
-        redis.incr(...this.args);
-    }
-
-    /**
-     * @param 查找值
-     */
-
-    get() {
-        return redis.get(...this.args);
-    }
-
-    /**
-     * @param hset 
-     */
-
-    hset() {
-        redis.hset(...this.args);
-    }
-
-    /**
-     * @param hvals
-     */
-
-    hvals() {
-        return redis.hvals(...this.args);
-    }
-
-    /**
-     * @param hget 
-     */
-    
-    hget() {
-        return redis.hget(...this.args);
-    }
-
-    /**
-     * @param 根据索引查询数据
-     */
-
-    lrange() {
-        return redis.lrange(...this.args);
-    }
-
-    /**
-     * @param set集合
-     */
-
-    sadd() {
-        redis.sadd(...this.args);
-    }
-
-    /**
-     * @param 创建空列表
-     */
-
-    rpush() {
-        redis.rpush(...this.args);
-    }
-
-    /**
-     * @param  获取集合数据
-     */
-
-    smembers() {
-        return redis.smembers(...this.args);
-    }
-
-    /**
-     * @param length
-     */
-    
-    llen() {
-        return redis.llen(...this.args);
-    }
-
-    /**
-     * @param 根据索引更新数据
-     */
-
-    lset() {
-        redis.lset(...this.args);
-    }
-
-    /**
-     * @param del 
-     */
-
-    lrem() {
-        redis.lrem(...this.args);
-    }
-
-    /**
-     * @param hdel
-     */
-
-    hdel() {
-        return redis.hdel(...this.args);
-    }
-
-    /**
-     * @param all keys
-     */
-
-    keys() {
-        return redis.keys(...this.args);
+    findData(str, where) {
+        // return db[str].findAll({ where: where });
+        return db[str].getCount('select count(*) from messPushes where isEnable = TRUE');
     }
 
 }
