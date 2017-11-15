@@ -609,7 +609,7 @@ class ApiController {
                 
                 arr.push(count);
             }
-            obj[v.mobileModel] = arr;
+            obj[v.name] = arr;
         })
 
         if (data && data.length > 0) {
@@ -622,14 +622,14 @@ class ApiController {
                     } else {
                         pieArray.push({
                             value: pre.sum,
-                            name: pre.mobileModel
+                            name: pre.name + ',' + pre.mobileModel
                         });
                     }
 
                     if (index === arr.length - 1) {
                         pieArray.push({
                             value: cur.sum,
-                            name: cur.mobileModel
+                            name: cur.name + ',' + cur.mobileModel
                         });
                     }
                     return cur;

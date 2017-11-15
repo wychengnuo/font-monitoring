@@ -494,7 +494,7 @@ class editMysql {
             if(str !== '') {
                 str += ' AND ';
             }
-            str = str + 'a.mobileModel = ' + '"' + mobileModel + '"' + 'and a.projectId = ' + projectId;
+            str = str + 'a.mobileModel = ' + '"' + mobileModel + '"' +   'and a.projectId = ' + projectId;
         }
 
         if (str !== '') {
