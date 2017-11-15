@@ -618,18 +618,18 @@ class ApiController {
 
                 data.reduce((pre, cur, index, arr) => {
                     if (pre.name === cur.name) {
-                        cur.sum = pre.sum + cur.sum;
+                        cur.sum = parseInt(pre.sum) + parseInt(cur.sum);
                     } else {
                         pieArray.push({
                             value: pre.sum,
-                            name: pre.name + ',' + pre.mobileModel
+                            name: pre.name
                         });
                     }
 
                     if (index === arr.length - 1) {
                         pieArray.push({
                             value: cur.sum,
-                            name: cur.name + ',' + cur.mobileModel
+                            name: cur.name
                         });
                     }
                     return cur;
