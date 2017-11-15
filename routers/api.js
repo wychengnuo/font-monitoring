@@ -614,25 +614,33 @@ class ApiController {
 
         if (data && data.length > 0) {
 
-            data.reduce((pre, cur, index, arr) => {
-                if (pre.name === cur.name) {
-                    cur.sum = pre.sum + cur.sum;
-                } else {
-                    pieArray.push({
-                        value: pre.sum,
-                        name: pre.mobileModel
-                    });
-                }
+            if (data.length !== 1) {
 
-                if (index === arr.length - 1) {
-                    pieArray.push({
-                        value: cur.sum,
-                        name: cur.mobileModel
-                    });
-                }
-                return cur;
-            })
+                data.reduce((pre, cur, index, arr) => {
+                    if (pre.name === cur.name) {
+                        cur.sum = pre.sum + cur.sum;
+                    } else {
+                        pieArray.push({
+                            value: pre.sum,
+                            name: pre.mobileModel
+                        });
+                    }
 
+                    if (index === arr.length - 1) {
+                        pieArray.push({
+                            value: cur.sum,
+                            name: cur.mobileModel
+                        });
+                    }
+                    return cur;
+                })
+            } else {
+                pieArray.push({
+                    value: data[0].sum,
+                    name: data[0].mobileModel
+                });
+            }
+            
             obj['pieData'] = pieArray;
 
             ctx.body = {
@@ -643,9 +651,9 @@ class ApiController {
         } else {
             ctx.body = {
                 success: false,
-                data: {},
-                msg: '失败'
-            };
+                data: null,
+                msg: '暂无数据'
+            }
         }
 
         await next();

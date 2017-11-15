@@ -39,7 +39,7 @@ module.exports = async (ctx, obj, homeDir, next) => {
         
         client.lpush('gm_front_' + obj.channel, JSON.stringify(obj));
 
-        if (parseInt(global.c) < 200) {
+        if (parseInt(global.c) < 500) {
 
             set = setInterval(async () => {
 
@@ -47,10 +47,10 @@ module.exports = async (ctx, obj, homeDir, next) => {
 
                 date(d, obj);
 
-            },3000)
+            },5000)
         }
 
-        if (parseInt(global.c) % 200 === 0) {
+        if (parseInt(global.c) % 500 === 0) {
             
             let d = await new editMysql().getPlugAnListInfoId(name, version, obj.projectId);
 
