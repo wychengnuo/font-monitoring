@@ -19,7 +19,8 @@
         'jfVersion': '1.0.0',
         'openTime': t,
         'httpUrlBasic': '/plugin/api/setBasic',
-        'httpUrl': '/plugin/api/setHtmlError'
+        'httpUrl': '/plugin/api/setHtmlError',
+        'departmentId': 8
     };
 
     var _maq = window._maq || [];
@@ -34,6 +35,9 @@
                 case '_setAccount':
                     packJSON.account = _maq[i][1];
                     packJSON.source = _maq[i][2];
+                    break;
+                case '_getMessage':
+                    packJSON.getMessageUrl = '/plugin/api/getMessageByStatus?plant=' + _maq[i][2];
                     break;
                 default:
                     break;
@@ -59,9 +63,9 @@
     if (navigator) {
         packJSON.lang = navigator.language || '';
         packJSON.userAgent = navigator.userAgent || '',
-            packJSON.appVersion = navigator.appVersion || '',
-            packJSON.appName = navigator.appName || '',
-            packJSON.platform = navigator.platform || '';
+        packJSON.appVersion = navigator.appVersion || '',
+        packJSON.appName = navigator.appName || '',
+        packJSON.platform = navigator.platform || '';
     }
 
     /**
@@ -141,6 +145,7 @@
             return true;
         }
         var eMs = {};
+        eObj = !eObj ? {} : eObj;
         if (!eObj && !eObj.stack) {
             eMs.sMsg = eObj.stack.toString();
         } else if (arguments.callee) {
@@ -157,6 +162,10 @@
                 f = f.caller;
             }
             ext = ext.join(',');
+
+            if (typeof eObj.stack == 'undefined') {
+                eObj.stack = '';
+            }
             eMs.sMsg = eObj.stack.toString();
         }
         eMs.sUrl = sUrl;
@@ -187,10 +196,11 @@
                 sUrl: o.sUrl,
                 sLine: o.sLine,
                 sColu: o.sColu,
-                eObj: o.eObj ? o.eObj.stack : ''
+                eObj: o.eObj ? o.eObj.stack : '',
+                sTime: getTime.getTime()
             };
             var d = JSON.stringify(data);
-            var t = o.sMsg.split(':')[1].replace(/\s+/g, '');
+            var t = !o.sMsg ? '' : o.sMsg.split(':')[1].replace(/\s+/g, '');
             t = t.substr(0, t.length / 2);
 
             /**
@@ -246,30 +256,27 @@
      * @param request 
      */
 
-    var request = new XMLHttpRequest();
+    
 
     var Ajax = {
         get: function (url, fn) {
+            var request = new XMLHttpRequest();
             request.open('GET', url, true);
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200 || request.status == 304) { // readyState==4说明请求已完成                    
                     fn.call(this, request.responseText); //从服务器获得数据
-                    console.log('调用成功', url);
                 }
-                console.log('调用不成功，url地址不对或者服务有问题或者网络问题。', url);
             };
             request.send(null);
         },
         post: function (url, data, fn) {
+            var request = new XMLHttpRequest();
             request.open('post', url, true);
             request.setRequestHeader('Content-type', 'application/json'); // 发送信息至服务器时内容编码类型
             request.onreadystatechange = function () {
-                if (request.readyState == 4 && (request.status == 200 || request.status == 304)) { // 304未修改
-                    if (fn)
-                        fn.call(this, request.responseText);
-                    console.log('调用成功', url);
+                if (request.readyState == 4 && request.status == 200 || request.status == 304) { // 304未修改
+                    fn.call(this, request.responseText);
                 }
-                console.log('调用不成功，url地址不对或者服务有问题或者网络问题。', url);
             };
             request.send(data);
         }
@@ -290,6 +297,7 @@
                 o[i] = obj[i];
             }
         }
+        o.departmentId = packJSON.departmentId;
         return o;
     }
 
@@ -328,7 +336,8 @@
         'lang': packJSON.lang,
         'sh': packJSON.sh,
         'sw': packJSON.sw,
-        'cd': packJSON.cd
+        'cd': packJSON.cd,
+        'departmentId': packJSON.departmentId
     };
     dataBody = JSON.stringify(dataBody);
     var dataErrorBody = JSON.stringify(localData);
@@ -336,7 +345,7 @@
     var isSendData = netState();
 
     // if (isSendData) {
-    Ajax.post(packJSON.httpUrlBasic, dataBody);
+    Ajax.post(packJSON.httpUrlBasic, dataBody, function(){});
     if (typeof dataErrorBody !== 'undefined') {
         Ajax.post(packJSON.httpUrl, dataErrorBody, function (data) {
             var date = JSON.parse(data);
@@ -344,6 +353,16 @@
                 ls.remove(localData);
             }
         });
+    }
+
+    // 消息推送
+    if (packJSON.getMessageUrl) {
+        Ajax.get(packJSON.getMessageUrl, function (data) {
+            var data = JSON.parse(data);
+            if (data.success && data.code === 1) {
+                alert(data.msg)
+            }
+        })
     }
     // } else {
     //     alert('网络不好！');
